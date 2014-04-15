@@ -1,0 +1,99 @@
+.jcarousel-wrapper {
+	position: relative;
+	margin-top: 1px;
+	margin-left: 23px;
+}
+/** Carousel **/
+
+.jcarousel {
+	position: relative;
+	overflow: hidden;
+	width: 630px;
+	height: 104px;
+}
+.jcarousel ul {
+	width: 20000em;
+	position: relative;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.jcarousel li {
+	float: left;
+	height: 104px;
+	margin-right: 1px;
+}
+.jcarousel li a {
+	display: block;
+	height: 104px;
+	width: 104px;
+	-webkit-backface-visibility: hidden;
+	-webkit-transform: rotate(0);
+	backface-visibility: hidden;
+	transform: rotate(0);
+}
+.jcarousel img.thumb {
+	width: 104px;
+	height: 104px;
+}
+.jcarousel img.thumb.transparent {
+	opacity: .5;
+}
+.jcarousel .loading {
+	text-align: center;
+	line-height: 90px; /* Fake vertical aligning */
+}
+/** Carousel Controls **/
+
+.jcarousel-control-prev, .jcarousel-control-next {
+	position: absolute;
+	top: 0;
+	height: 100%;
+	background-color: #e7ebec;
+	border-color: #e7ebec;
+	background-position: 5px center;
+	background-repeat: no-repeat;
+	text-indent: -5000px;
+	overflow: hidden;
+	padding: 0;
+	min-width: 21px;
+	min-height: 14px;
+	border-radius: 0;
+	-webkit-border-radius: 0;
+	transition: background-color 0.2s ease-out;
+	-webkit-transition: background-color 0.2s ease-out;
+	-moz-transition: background-color 0.2s ease-out;
+	-ms-transition: background-color 0.2s ease-out;
+	-o-transition: background-color 0.2s ease-out;
+}
+.jcarousel-control-prev:hover, .jcarousel-control-next:hover {
+	background-position: -35px center;
+	background-color: #e74c3c;
+	border-color: #e74c3c;
+}
+.jcarousel-control-prev {
+	left: -22px;
+	background-image: url(../images/arrow-6.png);
+}
+.jcarousel-control-prev:hover {
+	background-position: -36px center;
+}
+
+.ois_n { 
+ width: 4926px;
+}
+.jcarousel-control-next {
+	right: 1px;
+	width: 22px;
+	background-image: url(../images/arrow-5.png);
+}
+.jcarousel-control-prev:hover span, .jcarousel-control-next:hover span {
+	display: block;
+}
+.jcarousel-control-prev.inactive, .jcarousel-control-next.inactive {
+	cursor: default;
+}
+.jcarousel-control-prev.inactive:hover, .jcarousel-control-next.inactive:hover {
+	background-color: #e7ebec;
+	background-position: 5px center;
+}

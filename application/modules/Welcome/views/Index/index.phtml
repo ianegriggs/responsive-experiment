@@ -1,0 +1,40 @@
+<div class="container center">
+	<p class="logo"><a href="<?php echo $this->url(array(),'welcome_home');?>"><?php if(\Base\Config::get('site_logo_large')) { ?><img src="uploads/data/<?php echo \Base\Config::get('site_logo_large');?>" alt="Logo"><?php } else { ?><img src="assets/images/logo-xxl.png" width="332" height="93" alt="Logo"><?php } ?></a></p>
+	<h1 class="title-11 color-5"><?php echo $this->_('Organize and share things you love.');?></h1>
+	<h2 class="title-12 color-5"><?php echo sprintf($this->_('%s is an online pinboard.'),\Meta\Meta::getGlobal('title'));?></h2>
+	<div class="textbox">
+		<a class="various fancybox.iframe watch-video" href="//www.youtube.com/embed/Yhv_kT-Kxyw">- Watch the Video Now -</a>
+		<p><a href="<?php echo $this->url(array('controller' => 'login'),'user_c');?>" class="button button-color-1 button-size-large"><?php echo $this->_('Sign In');?></a></p>
+		<?php echo $this->widget('user.widget.social', array('method' => 'login', 'redirect' => $this->redirect, 'simple' => true));?>
+		<p><strong><?php echo sprintf($this->_('or, sign up new %s'),'<a href="'.$this->url(array('controller' => 'register'),'user_c').'" class="color-4">'.$this->_('account').'</a>');?></strong></p>
+	</div>
+	<a href="https://plus.google.com/101292259268713875936" rel="publisher" style="display:none">Find us on Google+</a>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$(".fancybox").fancybox();
+			
+			$(".various").fancybox({
+				// maxWidth	: 800,
+				// maxHeight	: 600,
+				maxWidth	: 400,
+				maxHeight	: 300,
+				fitToView	: false,
+				width		: '70%',
+				height		: '70%',
+				autoSize	: false,
+				closeClick	: false,
+				openEffect	: 'elastic',
+				closeEffect	: 'none'
+			});			
+		});
+	</script>	
+</div>
+<?php if(\Base\Config::get('config_welcome_image') && file_exists(BASE_PATH . '/uploads/data/' . \Base\Config::get('config_welcome_image'))) { ?>
+<?php ob_start();?>
+<style type="text/css">
+body.body-welcome {
+	background-image: url('<?php echo 'uploads/data/' . \Base\Config::get('config_welcome_image');?>');
+}
+</style>
+<?php $this->placeholder('style', ob_get_clean());?>
+<?php } ?>
