@@ -3949,7 +3949,7 @@ header .logobar p:first-child {
 	margin-top: 0;
 }
 header .usermenu {
-	position: absolute;
+	position: relative;
 	right: 0px;
 	top: 0px;
 }
