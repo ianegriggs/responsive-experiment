@@ -1,0 +1,272 @@
+<?php if($user && $user->id) { ?>
+<?php $self = \User\User::getUserData();?>
+<?php $request = $this->getRequest();?>
+<section class="margin-top-30 user-profile-head">
+	<div class="container">
+		<div class="profile">
+			<div class="cover">
+				<p class="set event-cover-holder"><img style="top:<?php echo $user->cover_top;?>px;" class="event-cover" alt="<?php echo sprintf($this->_('%s Cover'),$user->getUserFullname());?>" data-original="<?php echo \User\Helper\Cover::getImage('small', $user)->image;?>" src="assets/images/grey.gif" /></p>
+				<?php if($self->id == $user->id) { ?>
+				<div class="change event-change-cover-holder">
+					<a class="button button-color-1 button-size-small" href="javascript:;"><?php echo $this->_('Change Cover');?></a>
+					<nav class="dropdown">
+						<div class="dropdown-wrapper arrow-up">
+							<ul class="addpin stronglinks">
+								<li><a class="event-change-cover icon-uploadphoto" href="javascript:;"><?php echo $this->_('Upload photo');?></a></li>
+								<li><a class="icon-reposition event-reposition-cover" href="javascript:;"><?php echo $this->_('Repositon');?></a></li>
+								<li><a class="event-remove-cover icon-remove" href="javascript:;"><?php echo $this->_('Remove');?></a></li>
+							</ul>
+						</div>
+					</nav>
+				</div>
+				<div class="reposition-buttons event-reposition-cover-buttons">
+					<a href="javascript:;" class="button button-color-2 button-size-small event-reposition-cover-cancel"><?php echo $this->_('Cancel');?></a>
+					<a href="javascript:;" class="button button-color-1 button-size-small event-reposition-cover-save"><?php echo $this->_('Save');?></a>
+				</div>
+				<?php } ?>
+				<h3 class="title-10"><?php echo $user->getUserFullname();?></h3>
+			</div>
+			<div class="stats clearfix">
+				<p class="avatar">
+					<img class="event-avatar" width="200" height="200" alt="<?php echo $user->getUserFullname();?>" data-original="<?php echo \User\Helper\Avatar::getImage('medium', $user)->image;?>" src="assets/images/grey.gif" /> 
+					<?php if($self->id == $user->id) { ?>
+					<a class="event-change-avatar button button-color-2 button-size-small">Change Picture</a>
+					<?php } ?>
+				</p>
+				<ul class="items event-stats-user-<?php echo $user->id;?>">
+					<li><a<?php if($request->getController() == 'board') { ?> class="active"<?php } ?> href="<?php echo $this->url(array('controller'=>'board','user_id'=>$user->id,'query'=>$user->username),'user_c');?>"><?php echo sprintf($this->_('%s Boards'),'<span class="num event-boards">'.$user->boards.'</span>');?></a></li>
+					<li><a<?php if($request->getController() == 'pin') { ?> class="active"<?php } ?> href="<?php echo $this->url(array('controller'=>'pin','user_id'=>$user->id,'query'=>$user->username),'user_c');?>"><?php echo sprintf($this->_('%s Pins'),'<span class="num event-pins">'.$user->pins.'</span>');?></a></li>
+					<li><a<?php if($request->getController() == 'like') { ?> class="active"<?php } ?> href="<?php echo $this->url(array('controller'=>'like','user_id'=>$user->id,'query'=>$user->username),'user_c');?>"><?php echo sprintf($this->_('%s Likes'),'<span class="num event-likes">'.$user->likes.'</span>');?></a></li>	
+				</ul>
+				<ul class="items fright event-stats-user-<?php echo $user->id;?>">
+					<li><a<?php if($request->getController() == 'followers') { ?> class="active"<?php } ?> href="<?php echo $this->url(array('controller'=>'followers','user_id'=>$user->id,'query'=>$user->username),'user_c');?>"><?php echo sprintf($this->_('%s Followers'),'<span class="num event-followers">'.$user->followers.'</span>');?></a></li>
+					<li><a<?php if($request->getController() == 'following') { ?> class="active"<?php } ?> href="<?php echo $this->url(array('controller'=>'following','user_id'=>$user->id,'query'=>$user->username),'user_c');?>"><?php echo sprintf($this->_('%s Following'),'<span class="num event-following">'.$user->following.'</span>');?></a></li>	
+				</ul>
+				<?php if($self->id != $user->id) { ?>
+				<p class="follow fright">
+					<?php if(!$self->id) { ?>
+					<a class="button button-color-1 button-size-small" href="<?php echo $this->url(array('controller' => 'login', 'query' => '?next=' . urlencode($this->url(array('user_id' => $user->id,'query'=>$user->username),'user'))),'user_c',false,false);?>"><?php echo $this->_('Follow');?></a>
+					<?php } else if($user->following_user) { ?>
+					<a data-userid="<?php echo $user->id;?>" href="<?php echo $this->url(array('user_id' => $user->id,'controller'=>'follow','query'=>$user->username),'user_c');?>" class="event-follow-user button button-color-2 button-size-small" data-textactive="<?php echo $this->_('Unfollow');?>" data-textinactive="<?php echo $this->_('Follow');?>"><?php echo $this->_('Unfollow');?></a>
+					<?php } else { ?>
+					<a data-userid="<?php echo $user->id;?>" href="<?php echo $this->url(array('user_id' => $user->id,'controller'=>'follow','query'=>$user->username),'user_c');?>" class="event-follow-user button button-color-1 button-size-small" data-textactive="<?php echo $this->_('Unfollow');?>" data-textinactive="<?php echo $this->_('Follow');?>"><?php echo $this->_('Follow');?></a>
+					<?php } ?>
+				</p>	
+				<?php } ?>
+			</div>
+			<div class="data">
+				<ul class="location clearfix">
+					<?php /*if($country || $user->city) { ?>
+					<li class="icon-location"><?php echo $user->city;?>, <?php echo $country?$country->name:'';?></li>
+					<?php }*/ ?>
+					<?php if($country && $user->city) { ?>
+					<li class="icon-location"><?php echo $user->city;?>, <?php echo $country?$country->name:'';?></li>
+					<?php } else if($country) { ?>
+					<li class="icon-location"><?php echo $country?$country->name:'';?></li>
+					<?php } else if($user->city) { ?>
+					<li class="icon-location"><?php echo $user->city;?></li>
+					<?php } ?>
+					<?php if( ($name = \Core\Form\Validator::clearHost($user->website)) !== false ) { ?>
+					<li class="icon-www"><a href="<?php echo $user->website;?>" onclick="target='_blank'"><?php echo $name;?></a></li>
+					<?php } ?>
+				</ul>
+				<?php 
+					$menu = \Base\Menu::getMenu('profileLink');	
+				if($menu) {
+				?>
+				<ul class="socicons clearfix">
+					<?php foreach($menu AS $widget) { echo $this->widget($widget->widget); } ?>
+				</ul>
+				<?php } ?>
+				
+				<div class="clear"></div>
+				<p class="description"><?php echo $user->about;?></p>
+			</div>
+		</div>
+	</div>
+</section>
+<?php if($self->id == $user->id) { ?>
+<?php ob_start();?>
+<script type="text/javascript" src="assets/js/SimpleAjaxUploader.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	//avatar
+	var last_avatar = '<?php echo \User\Helper\Avatar::getImage('medium', $user)->image;?>';
+	new ss.SimpleUpload({
+	    button: $('.event-change-avatar').get(0), // file upload button
+	    url: '<?php echo $this->url(array('controller'=>'avatar','user_id'=>$user->id,'query'=>$user->username),'user_c');?>', // server side handler
+	    name: 'file', // upload parameter name        
+	    responseType: 'json',
+	    allowedExtensions: ['jpg', 'jpeg', 'png', 'gif'],
+	    maxSize: 2048, // kilobytes
+	    hoverClass: 'hovered',
+      	focusClass: 'hovered',
+	    disabledClass: 'disabled',   
+	    onSubmit: function() {
+	    	App.addLoader($('.profile .event-avatar').parent());
+		},
+	    onComplete: function(filename, response) {
+	        App.removeLoader($('.event-avatar').parent());
+			if (!response) {
+	            var message = ('<?php echo $this->escape( $this->_('%s upload failed.') );?>').replace('%s', filename);
+		    	$('.user-profile-head .container').prepend('<div class="notification error">' + message + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+	            return false;            
+	        }
+	        var img = new Image();
+	        img.src = response.file.medium.image;
+	        img.onload = function(){
+	        	last_avatar = this.src;
+				$('.event-avatar').attr('src', img.src);
+		    };
+		    img.onerror = function(){
+				alert('Unable to load image!');
+			}
+		},
+		onError: function( filename, type, status, statusText ) {
+			App.removeLoader($('.event-avatar').parent());
+			$('.event-avatar').attr('src', last_avatar);
+			alert(type);
+		},
+		onExtError: function( filename, extension ) {
+			App.removeLoader($('.event-avatar').parent());
+			$('.event-avatar').attr('src', last_avatar);
+			var message = ('<?php echo $this->escape( $this->_('%s is not a permitted file type. Only PNG, JPG, and GIF files are allowed.') );?>').replace('%s', filename);
+	    	$('.user-profile-head .container').prepend('<div class="notification error">' + message + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+		},
+	    onSizeError: function( filename, fileSize ) {
+	    	App.removeLoader($('.event-avatar').parent());
+			$('.event-avatar').attr('src', last_avatar);
+	    	var message = ('<?php echo $this->escape( $this->_('%s is too big. (2Mb max file size)') );?>').replace('%s', filename);
+	    	$('.user-profile-head .container').prepend('<div class="notification error">' + message + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+		}
+	});
+
+	//cover
+	var last_cover = '<?php echo \User\Helper\Cover::getImage('small', $user)->image;?>';
+	new ss.SimpleUpload({
+	    button: $('.event-change-cover').get(0), // file upload button
+	    url: '<?php echo $this->url(array('controller'=>'cover','user_id'=>$user->id,'query'=>$user->username),'user_c');?>', // server side handler
+	    name: 'file', // upload parameter name        
+	    responseType: 'json',
+	    allowedExtensions: ['jpg', 'jpeg', 'png', 'gif'],
+	    maxSize: 5120, // kilobytes
+	    hoverClass: 'hovered',
+      	focusClass: 'hovered',
+	    disabledClass: 'disabled',   
+	    onSubmit: function() {
+	    	App.addLoader($('.event-cover').parent());
+		},  
+		onComplete: function(filename, response) {
+			App.removeLoader($('.event-cover').parent());
+	        if (!response) {
+	            var message = ('<?php echo $this->escape( $this->_('%s upload failed.') );?>').replace('%s', filename);
+		    	$('.user-profile-head .container').prepend('<div class="notification error">' + message + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+	            return false;            
+	        }
+	        var img = new Image();
+	        img.src = response.file.small.image;
+	        img.onload = function(){
+	        	last_cover = img.src;
+				$('.event-cover').attr('src', img.src);
+				$('.event-reposition-cover').click();
+		    };
+		    img.onerror = function(){
+				alert('Unable to load image!');
+			}
+		},
+		onError: function( filename, type, status, statusText ) {
+			App.removeLoader($('.event-cover').parent());
+			$('.event-cover').attr('src', last_cover);
+			alert(type);
+		},
+		onExtError: function( filename, extension ) {
+			App.removeLoader($('.event-cover').parent());
+			$('.event-cover').attr('src', last_cover);
+			var message = ('<?php echo $this->escape( $this->_('%s is not a permitted file type. Only PNG, JPG, and GIF files are allowed.') );?>').replace('%s', filename);
+	    	$('.user-profile-head .container').prepend('<div class="notification error">' + message + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+		},
+	    onSizeError: function( filename, fileSize ) {
+			App.removeLoader($('.event-cover').parent());
+	    	$('.event-cover').attr('src', last_cover);
+	    	var message = ('<?php echo $this->escape( $this->_('%s is too big. (5Mb max file size)') );?>').replace('%s', filename);
+	    	$('.user-profile-head .container').prepend('<div class="notification error">' + message + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+		},
+		onMouseover: function() {
+			$('.event-change-cover').parents('.dropdown').css({opacity: 1, visibility: 'visible'});
+		},
+		onMouseout: function() {
+			$('.event-change-cover').parents('.dropdown').removeAttr('style');
+		}
+	});
+	//remove cover
+	$('.event-remove-cover').click(function(){
+		$('.event-cover').attr('width','').attr('src', 'assets/images/loaders/spinning-loader.svg');
+		App._ajax({
+			'url'		: '<?php echo $this->url(array('controller'=>'cover','action' => 'remove','user_id'=>$user->id,'query'=>$user->username),'user_c_a');?>',
+			'onSuccess'	: function(result){
+				if(result.error) {
+					$('.event-cover').attr('src', last_cover);
+					$('.user-profile-head .container').prepend('<div class="notification error">' + result.error + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+				} else if(result.location) {
+					window.location = result.location;
+				} else if(result.file) {
+					var img = new Image();
+			        img.src = result.file.small.image;
+			        img.onload = function(){
+			        	last_cover = img.src;
+						$('.event-cover').attr('src', img.src).css({'top':0})
+				    };
+				    img.onerror = function(){
+						alert('Unable to load image!');
+					}
+				} else {
+					$('.event-cover').attr('src', last_cover);
+					alert(result);
+				}
+			}
+		});
+	});
+	//reposition cover
+	$('.event-reposition-cover').click(function(){
+		var top = parseInt($(".event-cover").css('top'));
+		$('.event-change-cover-holder').hide();
+		$('.event-reposition-cover-buttons').show();
+		$(".event-cover").draggable({ 
+			containment: App.returnContainment(".event-cover"),
+			cursor: 'move' 
+		});
+		$('.event-reposition-cover-cancel').click(function() {
+			$(".event-cover").animate({'top':top});
+			$('.event-change-cover-holder').show();
+			$('.event-reposition-cover-buttons').hide();
+			$(".event-cover").draggable( "destroy" );
+			return false;
+		});
+		$('.event-reposition-cover-save').click(function() {
+			App.addLoader($('.event-cover').parent());
+			var topSave = parseInt($(".event-cover").css('top'));
+			App._ajax({
+				'url' : '<?php echo $this->url(array('controller'=>'cover','action'=>'reposition','user_id'=>$user->id,'query'=>$user->username),'user_c_a');?>',
+				'data' : {top : topSave},
+				onSuccess: function(json) {
+					App.removeLoader($('.event-cover').parent());
+					$('.event-change-cover-holder').show();
+					$('.event-reposition-cover-buttons').hide();
+					$(".event-cover").draggable( "destroy" );
+					if(json.error) {
+						$(".event-cover").animate({'top':top});
+						$('.user-profile-head .container').prepend('<div class="notification error">' + json.error + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+					} else if(json.ok) {
+						top = topSave;
+					}
+				}
+			});
+			
+			return false;
+		});
+	});
+});
+</script>
+<?php $this->placeholder('script', ob_get_clean());?>
+<?php } ?>
+<?php } ?>

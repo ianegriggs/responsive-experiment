@@ -1,0 +1,27 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<?php 
+$filter = array();
+if(\User\User::getUserData()->id) {
+	//follow
+	$filter['callback']['user_id'] = '\User\UserFollow::userFollowingArrayWithSelf('.\User\User::getUserData()->id.')';
+	$order = null;
+	$useIndex = array('PRIMARY','user_id');
+} else if(\Base\Model\Cache::get('home.pins')) {
+	//rand
+	$filter['callback']['id'] = '\Base\Model\Cache::get(\'home.pins\')';
+	$order = array('callback' => array('pin.id'=>'\Base\Model\Cache::get(\'home.pins\')'));
+	$useIndex = array('PRIMARY');
+} else {
+	$order = 'pin.id DESC';
+	$useIndex = array('PRIMARY');
+}
+
+echo $this->widget('pin.widget.grid', array(
+	'filter'=>$filter,
+	'useIndex' => $useIndex,
+	'order' => $order
+));
+?>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

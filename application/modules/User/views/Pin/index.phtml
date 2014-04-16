@@ -1,0 +1,19 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<?php echo $this->widget('user.widget.head', array(
+	'id'=>$this->getRequest()->getRequest('user_id')
+));
+?>
+
+<?php $self_data = \User\User::getUserData(); ?>
+
+<?php echo $this->widget('pin.widget.grid', array(
+	'filter'=>array(
+		'user_id' => $this->getRequest()->getRequest('user_id')
+	),
+	'useIndex' => array('PRIMARY','user_id'),
+	'createNewPin' => $self_data->id ? $self_data->id == $this->getRequest()->getRequest('user_id') : false,
+));
+?>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

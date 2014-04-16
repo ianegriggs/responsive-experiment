@@ -1,0 +1,18 @@
+<?php 
+if($this->getRequest()->getParam('___layout___') == 'admin') {
+	echo $this->getController('admin/layout/header_part');
+} else {
+	echo $this->getController('home/layout/header_part');
+}
+?>
+<div class="no-results">
+	<div class="container">
+		<p><?php echo $message?></p>	
+	</div>
+</div>
+
+<?php 
+if($this->getRequest()->getParam('___layout___') == 'admin') {
+	echo $this->getController('admin/layout/footer_part');
+}
+?>

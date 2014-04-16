@@ -1,0 +1,14 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<section id="content">
+	<div class="container bgcolor-1 radius">
+		<div class="padding-3">
+			<div class="textbox">
+				<h1><?php echo $page->title;?></h1>
+				<?php echo $page->description;?>
+			</div>
+		</div>	
+	</div>
+</section>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

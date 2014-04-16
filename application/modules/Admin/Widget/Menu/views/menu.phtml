@@ -1,0 +1,39 @@
+<?php $module = $this->getRequest()->getModule();?>
+<ul>
+	<li id="menu_index"<?php if($module == 'admin') {?> class="active"<?php } ?>>
+		<a href="<?php echo $this->url(array(),'admin');?>"><?php echo $this->_('Dashboard');?></a>
+	</li>
+	<?php if($menu) { ?>
+	<?php foreach($menu AS $m) { ?>
+	<li id="menu_<?php echo $m->id;?>"<?php if($module == $m->widget) {?> class="active"<?php } ?>>
+		<?php $wroute = (array)unserialize($m->route);?>
+		<?php if($m->widget) { ?>
+		<?php 
+			$route = 'admin_module';
+			if(!isset($wroute['module'])) {
+				$wroute['module'] = $m->widget;
+			} else {
+				$route = $m->widget;
+			}
+		?>
+		<a href="<?php echo $this->url($wroute,$route);?>"><?php echo $this->_($m->title);?></a>
+		<?php } else { ?>
+		<a href="javascript:;"><?php echo $this->_($m->title);?></a>
+		<?php } ?>
+		<?php echo $this->widget('admin.widget.menu', array('parent_id' => $m->id));?>
+	</li>
+	<?php } ?>
+	<?php } ?>
+</ul>
+<script type="text/javascript">
+$(document).ready(function() {
+	//menu
+	$('#menu ul li:has(ul) > a').addClass('more');
+	$('#menu ul li a.more').append('<span class="arrow">&nbsp;&nbsp;&raquo;</span>');
+	$('#menu ul li').hover(function () {
+		$(this).find('ul:first').stop(true, true).animate({opacity: 'toggle', height: 'toggle'}, 200).addClass('active_list');
+	}, function () {
+		$(this).children('ul.active_list').stop(true, true).animate({opacity: 'toggle', height: 'toggle'}, 200).removeClass('active_list');
+	});
+});
+</script>

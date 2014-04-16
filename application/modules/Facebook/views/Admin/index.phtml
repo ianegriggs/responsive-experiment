@@ -1,0 +1,40 @@
+<?php echo $this->getController('admin/layout/header_part'); ?>
+
+<?php 
+$self = $this;
+echo $this->widget('widget.form.phparray', array(
+	'head' => array(
+		'title' => $this->_('Facebook Settings'),
+	),
+	'columns' => \Base\Config::getGroupForm('facebook', $this->_),
+	'onSave' => function($values, $widget) use($self) {
+		$menuTable = new \Base\Menu();
+		$menuTable->getAdapter()->beginTransaction();
+		try {
+			$facebook = new \Facebook\Helper\Me($values['facebook_key'], $values['facebook_pass'], true);
+			$menu = $menuTable->fetchRow(array('widget = ?'=> 'facebook.widget.oauth'));
+			if($menu) {
+				$menu->status = $values['facebook_status'];
+				$menu->save();
+			}
+			if($values['facebook_status'] ? $facebook->api($values['facebook_key']) : true) {
+				if(\Base\Config::updateGroup('facebook', $values)) {
+					$menuTable->getAdapter()->commit();
+					return true;
+				} else {
+					$widget->errors = \Base\Config::getErrors();
+				}
+			} else {
+				$widget->errors = $self->_('Facebook application with this id not found');
+			}
+		} catch (\Core\Exception $e) {
+			$widget->errors = $e->getMessage();
+		}
+		$menuTable->getAdapter()->rollBack();
+		return false;
+	}
+));
+
+?>
+
+<?php echo $this->getController('admin/layout/footer_part'); ?>

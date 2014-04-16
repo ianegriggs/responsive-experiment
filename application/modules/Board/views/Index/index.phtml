@@ -1,0 +1,67 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+<?php $self_data = \User\User::getUserData(); ?>
+
+<section class="bgcolor-1" id="headbar">
+	<div class="container table">
+		<div class="boardbar center table-row">
+			<nav class="usermenu usermenu-left cell-25">
+				<ul>
+					<li><a class="member event-tooltip" href="<?php echo $this->url(array('user_id'=>$user->id,'query'=>$this->urlQuery($user->username)),'user');?>" title="<?php echo $this->escape($user->getUserFullname());?>"><img class="event-load-lazy-load" data-original="<?php echo \User\Helper\Avatar::getImage('small', $user)->image;?>" src="assets/images/grey.gif" width="60" height="60" alt="avatar"/></a></li>
+					<?php if($users) { ?>
+					<?php foreach($users AS $usr) { ?>
+					<li><a class="member event-tooltip" href="<?php echo $this->url(array('user_id'=>$usr->id,'query'=>$this->urlQuery($usr->username)),'user');?>" title="<?php echo $this->escape($usr->getUserFullname());?>"><img class="event-load-lazy-load" data-original="<?php echo \User\Helper\Avatar::getImage('small', $usr)->image;?>" src="assets/images/grey.gif" width="60" height="60" alt="avatar"/></a></li>
+					<?php } ?>
+					<?php } ?>
+				</ul>
+			</nav>
+			
+			<h3 class="title-3 padding-2 cell-50">
+				<?php echo $board->title;?>
+				<small><?php echo sprintf($this->_('%d followers, %d pins'), $board->followers, $board->pins);?></small>
+			</h3>	
+			
+			<ul class="pinicons cell-25">
+				<?php if($self_data->id && ($self_data->id == $board->user_id || $self_data->is_admin)) { ?>
+				<li><a class="event-fancybox-ajax event-tooltip icon-pinpage-edit" href="<?php echo $this->url(array('controller'=>'edit', 'board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board_c');?>" title="<?php echo $this->_('Edit');?>"><?php echo $this->_('Edit');?></a></li>
+				<?php } ?>
+				<li>
+					<a class="icon-pinpage-1" href="javascript:;" addthis:url="<?php echo $this->url(array('board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board');?>" addthis:title="<?php echo $board->title;?>">&nbsp;</a>
+					<nav class="dropdown">
+						<div class="dropdown-wrapper arrow-up-left">
+							<ul class="event-addthis-buttons">
+								<li><a class="addthis_button_facebook" addthis:url="<?php echo $this->url(array('board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board');?>" addthis:title="<?php echo $board->title;?>"><?php echo $this->_('Facebook'); ?></a></li>
+								<li><a class="addthis_button_twitter" addthis:url="<?php echo $this->url(array('board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board');?>" addthis:title="<?php echo $board->title;?>"><?php echo $this->_('Twitter'); ?></a></li>
+								<li><a class="addthis_button_linkedin" addthis:url="<?php echo $this->url(array('board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board');?>" addthis:title="<?php echo $board->title;?>"><?php echo $this->_('LinkedIn'); ?></a></li>
+								<li><a class="addthis_button_google" addthis:url="<?php echo $this->url(array('board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board');?>" addthis:title="<?php echo $board->title;?>"><?php echo $this->_('Google'); ?></a></li>
+								<li><a class="addthis_button_tumblr" addthis:url="<?php echo $this->url(array('board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board');?>" addthis:title="<?php echo $board->title;?>"><?php echo $this->_('Tumblr'); ?></a></li>
+								<li><a class="addthis_button_blogger" addthis:url="<?php echo $this->url(array('board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board');?>" addthis:title="<?php echo $board->title;?>"><?php echo $this->_('Blogger'); ?></a></li>
+								<li><a class="addthis_button_delicious" addthis:url="<?php echo $this->url(array('board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board');?>" addthis:title="<?php echo $board->title;?>"><?php echo $this->_('Delicious'); ?></a></li>
+								<li><a class="addthis_button_email" addthis:url="<?php echo $this->url(array('board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board');?>" addthis:title="<?php echo $board->title;?>"><?php echo $this->_('Email'); ?></a></li>
+								<li><a class="addthis_button_gmail" addthis:url="<?php echo $this->url(array('board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board');?>" addthis:title="<?php echo $board->title;?>"><?php echo $this->_('Gmail'); ?></a></li>
+								<li><a class="addthis_button_more" addthis:url="<?php echo $this->url(array('board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board');?>" addthis:title="<?php echo $board->title;?>"><?php echo $this->_('More...'); ?></a></li>
+							</ul>
+						</div>
+					</nav>
+				</li>
+			</ul>
+		</div>
+	</div>
+</section>
+
+<?php $self_data = \User\User::getUserData(); ?>
+
+<?php echo $this->widget('pin.widget.grid', array(
+	'filter'=>array(
+		'board_id' => $board->id
+	),
+	'useIndex' => array('PRIMARY','board_id'),
+	'description' => $board->description,
+'createNewPin' => $self_data->id ? $self_data->id == $board->user_id : false,
+));
+?>
+
+<script type="text/javascript">
+head.js({'addthis_widget': 'http://s7.addthis.com/js/250/addthis_widget.js'});
+</script>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

@@ -1,0 +1,18 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<section id="content">
+	<div class="container bgcolor-1 radius">
+		<div class="padding-3">
+			<div class="textbox">
+				<h1><?php echo $this->_('Success');?></h1>
+				<h2><?php echo $this->_('Your Account Has Been Created!');?></h2>
+				<p><?php echo sprintf($this->_('Thank you for registering with %s!'), $user->email);?></p>
+				<?php if($byEmail) { ?>
+				<p><?php echo $this->_('You will be notified by email how to activate your profile.');?></p>
+				<?php } else { ?>
+				<p><?php echo $this->_('You will be notified by email once your account has been activated by the site owner.');?></p>
+				<?php } ?>
+			</div>
+		</div>	
+	</div>
+</section>

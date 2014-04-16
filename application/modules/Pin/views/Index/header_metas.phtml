@@ -1,0 +1,5 @@
+<title><?php echo $pin->description;?></title>
+
+<?php $image = \Pin\Helper\Image::getImage('medium', $pin);?>
+<link rel="image_src" href="<?php echo $image->image;?>">
+<meta name="url" content="<?php echo $this->url(array('pin_id' => $pin->id),'pin');?>">

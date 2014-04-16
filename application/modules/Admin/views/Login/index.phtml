@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title><?php echo $this->_('Administration');?></title>
+
+<base href="<?php echo $this->getRequest()->getBaseUrl();?>" />
+
+<link href="cms/admin/assets/login.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript" src="cms/assets/jquery.js"></script>
+<script type="text/javascript" src="cms/admin/assets/main.js"></script>
+
+</head>
+<body>
+
+	<div class="login-box">
+	  <div class="login-border">
+	    <div class="login-style">
+	      <div class="login-header">
+	        <div class="logo"><?php echo $this->_('Administration');?></div>
+	      </div>
+	      <form action="<?php echo $this->url(array(),'admin_login');?>" method="post">
+	        <div class="login-inside">
+	          <div class="login-data">
+	            <div class="row ">
+	              <label for="user"><?php echo $this->_('E-mail');?>:</label>
+	              <input name="email" autocomplete="off" type="text" class="inputbox" id="user"  size="25" />
+	              <input type="hidden" name="X-form-cmd" value="<?php echo $this->x_form_cmd;?>" />
+					<?php if($this->redirect) { ?>
+					<input type="hidden" name="redirect" value="<?php echo $this->redirect;?>" />
+					<?php } ?>
+	            </div>
+	            <div class="row ">
+	              <label for="password"><?php echo $this->_('Password');?>:</label>
+	              <input name="password" autocomplete="off" type="password" class="inputbox" id="password"  size="25" />
+	            </div>
+	            <input name="submit" type="submit" class="button" value="<?php echo $this->_('Login');?>" id="submit" />
+	          </div>
+	          <p><?php echo $this->_('Enter your username and password to login.');?></p>
+	        </div>
+	        <div class="login-footer"> <a href="./" class="button"><?php echo $this->_('Go to the site');?></a> </div>
+	      </form>
+	    </div>
+	  </div>
+	</div>
+	
+	<div class="msg">
+		<?php if($errors) { ?>
+	  	<div id="fader_login"><div class="msgError"><span><?php echo $this->_('Error!');?></span><br /><?php echo implode('<br />', $errors);?></div></div>
+	    <script type="text/javascript"> 
+	    $(document).ready(function() {       
+	      setTimeout(function() {       
+	        $("#fader_login").fadeOut("slow",    
+	        function() {       
+	          $("#fader_login").remove();  
+	        });
+	      },
+	      400000);
+	    });
+	    </script>
+	    <?php } ?>
+	</div>
+
+</body>
+
+</html>

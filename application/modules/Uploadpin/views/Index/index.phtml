@@ -1,0 +1,62 @@
+<div class="popup">
+	<div class="head">
+		<h3 class="title-2 color-1"><?php echo $this->_('Add a pin from your computer');?></h3>
+	</div>
+	<div class="body event-create-pin-body">
+		<div class="mainform pinform">
+			<div class="row">
+				<div class="cell">
+					<span class="input-file event-upload-pin">
+						<input type="text" class="attachment event-display-file" readonly="readonly">
+						<a href="javascript:void(0)" class="button button-color-1 event-loader"><?php echo $this->_('Choose File');?></a>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+Turbo.head({
+	js: ['assets/js/SimpleAjaxUploader.min.js'],
+	callback: function(){
+		new ss.SimpleUpload({
+		    button: $('.event-upload-pin').get(0), // file upload button
+		    url: '<?php echo $this->url(array('controller'=>'upload'),'uploadpin_c');?>', // server side handler
+		    name: 'file', // upload parameter name        
+		    responseType: 'json',
+		    allowedExtensions: ['jpg', 'jpeg', 'png', 'gif'],
+		    maxSize: 10240, // kilobytes  
+		    onSubmit: function() {
+		    	App.addLoader('.event-loader');
+		    	$('.notification.error').remove();
+			},  
+		    onComplete: function(filename, response) {
+		        if (!response) {
+		            var message = ('<?php echo $this->escape( $this->_('%s upload failed.') );?>').replace('%s', filename);
+		            $('.event-upload-pin').parent().parent().prepend('<div class="notification error">' + message + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+		            return false;            
+		        }
+		        App.removeLoader('.event-loader');
+		        $('.event-create-pin-body').replaceWith(response.html).callbackAfter(function(){
+		        	App.selectBox();
+			    });
+			    
+			},
+			onError: function( filename, type, status, statusText ) {
+				App.removeLoader('.event-loader');
+				alert(type);
+			},
+			onExtError: function( filename, extension ) {
+				App.removeLoader('.event-loader');
+				var message = ('<?php echo $this->escape( $this->_('%s is not a permitted file type. Only PNG, JPG, and GIF files are allowed.') );?>').replace('%s', filename);
+				$('.event-upload-pin').parent().parent().prepend('<div class="notification error">' + message + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+			},
+		    onSizeError: function( filename, fileSize ) {
+		    	App.removeLoader('.event-loader');
+		    	var message = ('<?php echo $this->escape( $this->_('%s is too big. (10Mb max file size)') );?>').replace('%s', filename);
+		    	$('.event-upload-pin').parent().parent().prepend('<div class="notification error">' + message + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+			}
+		});
+	}
+});
+</script>

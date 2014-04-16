@@ -1,0 +1,16 @@
+<?php if($location) { $this->redirect($location); exit; } ?>
+<?php if(!$isXmlHttpRequest) {
+	echo $this->getController('home/layout/header_part');
+}  ?>
+<?php $userInfo = \User\User::getUserData();?>
+<div class="popup">
+	<div class="head">
+		<h3 class="title-2 color-1"><?php echo $this->_('Change Picture');?></h3>
+	</div>
+	<div class="body">
+		<?php echo $this->widget('user.widget.avatar', array('redirect' => $this->url(array('user_id' => $userInfo->id,'query'=>$userInfo->username),'user')));?>
+	</div>
+</div>
+<?php if(!$isXmlHttpRequest) {
+	echo $this->getController('home/layout/footer_part');
+} ?>

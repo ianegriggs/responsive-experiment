@@ -1,0 +1,110 @@
+<?php if($boards->count()) { ?>
+<?php $self_data = \User\User::getUserData(); ?>
+<section class="margin-top-30 board-content-shared">
+	<div class="container fluid">
+		<div class="boardcontainer clearfix">
+			<?php $total_boards = $boards->count();?>
+			<?php foreach($boards AS $board) { ?>
+			<?php 
+				$pins = $board->findDependentRowset('Pin\Pin', null, $board->select()->limit(8)->order('id DESC'));
+			?>
+			<article class="board">
+				<div class="mask">
+					<p class="member"><a href="<?php echo $this->url(array('user_id' => $board->user_id,'query'=>$board->username),'user');?>" class="avatar"><img data-original="<?php echo \User\Helper\Avatar::getImage('small', $board)->image;?>" src="assets/images/grey.gif" width="48" height="48" alt="<?php echo $board->getUserFullname();?>"></a></p>
+					<p class="invtext"><?php echo sprintf($this->_('<strong>%s</strong> invited you to this board'),'<a href="'.$this->url(array('user_id' => $board->user_id,'query'=>$board->username),'user').'">'.$board->getUserFullname().'</a>');?></p>
+					<div class="btns">
+						<a href="javascript:;" data-id="<?php echo $board->id;?>" class="button button-color-1 button-size-small event-board-invate-accept"><?php echo $this->_('Accept');?></a>
+						<a href="javascript:;" data-id="<?php echo $board->id;?>" class="button button-color-2 button-size-small event-board-invate-decline"><?php echo $this->_('No thanks');?></a>
+					</div>
+				</div>
+				<div class="data clearfix">
+					<div class="fleft">
+						<h3 class="title-3"><?php echo $board->title;?></h3>
+						<p class="meta-text event-stats-board-<?php echo $board->id;?>"><?php echo sprintf($this->_('%s Pins %s Followers'),'<span class="num event-pins">'.$board->pins.'</span>','<span class="num event-followers">'.$board->followers.'</span>');?></p>
+					</div>
+					<div class="fright">
+						<?php /* ?>
+						<ul class="boardicons clearfix">
+							<li><a href="#" class="icon-check">Check</a></li>
+						</ul>
+						<?php */ ?>
+						<?php if(!$self_data->id) { ?>
+						<a data-userid="<?php echo $board->user_id;?>" href="<?php echo $this->url(array('controller' => 'login', 'query' => '?next=' . urlencode($this->url(array('board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board'))),'user_c',false,false);?>" class="button button-color-1 button-size-small"><?php echo $this->_('Follow');?></a>
+						<?php } else if($self_data->id != $board->user_id && $board->following_board) { ?>
+						<a data-userid="<?php echo $board->user_id;?>" data-boardid="<?php echo $board->id;?>" href="<?php echo $this->url(array('board_id' => $board->id,'controller'=>'follow','query'=>$this->urlQuery($board->title)),'board_c');?>" class="event-follow-board button button-color-2 button-size-small" data-textactive="<?php echo $this->_('Unfollow');?>" data-textinactive="<?php echo $this->_('Follow');?>"><?php echo $this->_('Unfollow');?></a>
+						<?php } else if($self_data->id != $board->user_id) { ?>
+						<a data-userid="<?php echo $board->user_id;?>" data-boardid="<?php echo $board->id;?>" href="<?php echo $this->url(array('board_id' => $board->id,'controller'=>'follow','query'=>$this->urlQuery($board->title)),'board_c');?>" class="event-follow-board button button-color-1 button-size-small" data-textactive="<?php echo $this->_('Unfollow');?>" data-textinactive="<?php echo $this->_('Follow');?>"><?php echo $this->_('Follow');?></a>
+						<?php } ?>
+					</div>
+				</div>
+				<div class="items clearfix">
+					<ul>
+						<?php for($i=0; $i<8; $i++) { ?>
+						<?php 
+						if($pins->offsetExists($i)) {
+							$image = \Pin\Helper\Image::getImage('small', $pins[$i]);
+						} else {
+							$image = \Pin\Helper\Image::noImage('small');
+						} ?>
+						<li><a href="<?php echo $this->url(array('board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board');?>"><img src="assets/images/grey.gif" data-original="<?php echo $image->image;?>" width="100" height="100" alt="<?php echo $this->escape($board->title);?>" /></a></li>
+						<?php } ?>
+					</ul>
+				</div>
+			</article>
+			<?php } ?>
+		</div>
+	</div>
+</section>
+<?php ob_start();?>
+<script type="text/javascript">
+$(document).ready(function() {
+	$('.event-board-invate-accept').click(function(){
+		$this = $(this);
+		App.addLoader($this);
+		$('.notification.error').remove();
+		App._ajax({
+			url: '<?php echo $this->url(array('controller'=>'share'),'board_c');?>',
+			data:{bid:$this.data('id'),method:'accept'},
+			type: 'POST',
+			onSuccess:function(json) {
+				App.removeLoader($this);
+				if(json.location) {
+					window.location = json.location;
+				} else if(json.error) {
+					$('board-content-shared .boardcontainer').prepend('<div class="notification error">' + json.error + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+				} else if(json.ok) {
+					$board = $this.parents('.board');
+					$board.find('.mask').remove();
+					$('#content .boardcontainer').append($board);
+				} else {
+					console.log(json);
+				}
+			}
+		});
+	});
+	$('.event-board-invate-decline').click(function(){
+		$this = $(this);
+		App.addLoader($this);
+		$('.notification.error').remove();
+		App._ajax({
+			url: '<?php echo $this->url(array('controller'=>'share'),'board_c');?>',
+			data:{bid:$this.data('id'),method:'decline'},
+			type: 'POST',
+			onSuccess:function(json) {
+				App.removeLoader($this);
+				if(json.location) {
+					window.location = json.location;
+				} else if(json.error) {
+					$('board-content-shared .boardcontainer').prepend('<div class="notification error">' + json.error + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+				} else if(json.ok) {
+					$this.parents('.board').remove();
+				} else {
+					console.log(json);
+				}
+			}
+		});
+	});
+});
+</script>
+<?php $this->placeholder('script',ob_get_clean());?>
+<?php } ?>

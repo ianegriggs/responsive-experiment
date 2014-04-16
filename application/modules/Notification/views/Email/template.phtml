@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title><?php echo $title;?></title>
+</head>
+
+<body style="font-family:Arial, Helvetica, sans-serif;background-color:#f7f7f7;margin:0;padding:0 0 30px;color:#7c8792;">
+	<div style="background-color:#fff;height:101px;padding-top:33px;text-align:center;"><a href="<?php echo $this->url(array(),'welcome_home');?>"><?php if(\Base\Config::get('site_logo_big') && file_exists(BASE_PATH . '/uploads/data/' . \Base\Config::get('site_logo_big'))) { ?><img src="<?php echo $this->getRequest()->getBaseUrl();?>uploads/data/<?php echo \Base\Config::get('site_logo_big');?>" alt="<?php echo \Meta\Meta::getGlobal('title', $language_id);?>" /><?php } else { ?><img src="<?php echo $this->getRequest()->getBaseUrl();?>assets/images/logo-large.png" width="221" height="64" alt="Logo"><?php } ?></a></div>
+	<div style="background-color:#fff;width:540px;margin:30px auto 0;padding:20px 30px;border-radius:5px;-webkit-border-radius:5px;">
+		<h3 style="margin:0;padding:0 0 16px;font-size:18px;line-height:21px;border-bottom:1px solid #ecf0f1;"><?php echo $title;?></h3>
+		<div style="font-size:14px;line-height:21px;padding:20px 0;">
+			<?php echo $description;?>
+		</div>
+		<?php if($footer) { ?>
+		<div style="margin:0;padding:15px 0 0;font-size:12px;line-height:21px;border-top:1px solid #ecf0f1;"><?php echo $footer->description;?></div>
+		<?php } ?>
+	</div>
+</body>
+</html>

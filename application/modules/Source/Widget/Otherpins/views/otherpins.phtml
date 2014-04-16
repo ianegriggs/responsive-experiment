@@ -1,0 +1,50 @@
+<?php if($pins && $pins->count()) { ?>
+<div class="whitebox">
+	<p class="meta-text-2 no-strong"><?php echo $this->_('Other pins from');?></p>
+	<h3 class="title-5"><a href="<?php echo $this->url(array('source_id'=>$source->id, 'query'=>$source->name),'source');?>"><?php echo $source->name;?></a></h3>
+	<div class="gallery">
+		<a href="javascript:;" class="button button-gallery button-gallery-prev event-gallery-prev-from-source<?php echo $source->id;?>">&nbsp;</a>
+		<ul class="clearfix event-source<?php echo $source->id;?>-pins">
+			<?php foreach($pins AS $pin) { ?>
+			<li><a class="event-turbo-click event-history event-width-100 event-no-loader" href="<?php echo $this->url(array('pin_id'=>$pin->id),'pin');?>"<?php if($popup) { ?> data-popup="true"<?php } ?>><img class="event-load-lazy-load" width="78" height="78" alt="Thumb" src="assets/images/grey.gif" data-original="<?php echo \Pin\Helper\Image::getImage('small', $pin)->image;?>" onload="$(this).LazyLoad();" /></a></li>
+			<?php } ?>
+		</ul>
+		<a href="javascript:;" class="button button-gallery button-gallery-next event-gallery-next-from-source<?php echo $source->id;?>">&nbsp;</a>
+	</div>
+</div>
+<script type="text/javascript">
+var cachedDataSource<?php echo $source->id;?> = {'1' : $('.event-source<?php echo $source->id;?>-pins').get(0).outerHtml}, page=1;
+$('.event-gallery-prev-from-source<?php echo $source->id;?>').click(function() {
+	var self = this;
+	App.addLoaderFull(self);
+	page--;
+	if(page < 1) {
+		page = 1;
+	}
+	if(cachedDataSource<?php echo $source->id;?>[page]) {
+		$('.event-source<?php echo $source->id;?>-pins').replaceWith(cachedDataSource<?php echo $source->id;?>[page]);
+	}
+	App.removeLoader(self);
+});
+$('.event-gallery-next-from-source<?php echo $source->id;?>').click(function() {
+	var self = this;
+	App.addLoaderFull(self);
+	page++;
+	if(cachedDataSource<?php echo $source->id;?>[page]) {
+		App.removeLoader(self);
+		$('.event-source<?php echo $source->id;?>-pins').replaceWith(cachedDataSource<?php echo $source->id;?>[page]);
+	} else {
+		App._ajax({
+			'url' : '?widget=source.widget.otherpins&source_id=<?php echo $source->id;?>&page='+ page + '&limit=<?php echo $this->limit;?><?php if($popup) { ?>&popup=true<?php } ?>',
+			'onSuccess': function(data) {
+				if(data) {
+					cachedDataSource<?php echo $source->id;?>[page] = data;
+					$('.event-source<?php echo $source->id;?>-pins').replaceWith(data);
+				}
+				App.removeLoader(self);
+			}
+		});
+	}
+});
+</script>
+<?php } ?>

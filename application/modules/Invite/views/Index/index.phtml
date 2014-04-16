@@ -1,0 +1,70 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<?php echo $this->widget('invite.widget.inviteheader'); ?>
+
+<section id="content">
+	
+	<div class="container mobile bgcolor-1 padding-4 radius arrow-left">
+		<span class="sticky-icon-logreg"></span>
+		<div class="registerform">
+			<form action="<?php echo $this->url(array(),'invite');?>" method="post" class="event-invite-form">
+				<?php if($this->errors) { ?>
+				<div class="notification error no-mtop">
+					<?php echo implode('<br />', $this->errors);?>
+					<a class="button-close" href="javascript:;"><?php echo $this->_('Close')?></a>
+				</div>
+				<?php } else if($this->success) { ?>
+				<div class="notification success color-7">
+					<?php echo $this->success;?>
+					<a class="button-close" href="javascript:;"><?php echo $this->_('Close')?></a>
+				</div>
+				<?php } ?>
+				<?php for($i = 0; $i < $this->limit; $i ++) { ?>
+				<div class="row">
+					<input type="text" name="email<?php echo $i;?>" value="<?php echo $this->getRequest()->getPost('email' . $i)?>" placeholder="<?php echo $this->escape($this->_('E-mail'));?>" class="icon-input-email<?php if(isset($this->errors['email' . $i])) { echo ' error-field'; }?> event-email<?php echo $i;?>" />
+				</div>
+				<?php } ?>
+				<div class="row">
+					<button type="submit" class="event-loader button button-color-1 button-size-large"><?php echo $this->_('Send');?></button>
+				</div>
+				<p class="hide">
+					<input type="hidden" name="X-form-cmd" value="<?php echo $this->x_form_cmd;?>" />
+					<?php if($this->redirect) { ?>
+					<input type="hidden" name="redirect" value="<?php echo $this->redirect;?>" />
+					<?php } ?>
+				</p>
+			</form>
+		</div>
+	</div>
+</section>
+
+<script type="text/javascript">
+$('.event-invite-form').submit(function() {
+	self = this;
+	$('.icon-input-email',self).removeClass('error-field');
+	App.addLoader('.event-loader');
+	$('.notification.error,.notification.success').remove();
+	App._ajax({
+		url: '<?php echo $this->url(array(),'invite');?>',
+		data: $(self).serialize(),
+		type: 'POST',
+		onSuccess: function(json) {
+			App.removeLoader('.event-loader');
+			if(json.ok) {
+				$('.icon-input-email',self).val('');
+				$(self).prepend('<div class="notification success no-mtop"><?php echo $this->escape($this->_('The invitation was sent successfully!'));?><a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+			} else if(json.errors) {
+				var error = '';
+				for( i in json.errors ) {
+					error = json.errors[i];
+					$('.event-' + i).addClass('error-field');
+				}
+				$('<div class="notification error">' + error + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>').insertBefore(self);
+			}
+		}
+	});
+	return false;
+});
+</script>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

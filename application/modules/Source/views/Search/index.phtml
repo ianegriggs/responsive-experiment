@@ -1,0 +1,13 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<?php echo $this->widget('pin/SearchHeader'); ?>
+
+<?php echo $this->widget('board/grid', array(
+	'filter'=>array(
+		'title' => $this->getRequest()->getRequest('query')
+	),
+	'useIndex' => array('PRIMARY','title')
+));
+?>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

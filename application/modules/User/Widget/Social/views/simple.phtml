@@ -1,0 +1,12 @@
+<?php 
+$menu = \Base\Menu::getMenu('oAuth');
+if($menu) {
+?>
+<?php for($i = 0, $j = 0; $i < ceil(count($menu)/2); $i++ ) { ?>
+<p>
+	<?php for($r = 0; $r < 2; $r++, $j++ ) { ?>
+	<?php if(isset($menu[$j])) { echo $this->widget($menu[$j]->widget, array('method' => $this->method, 'redirect' => $this->redirect)); } ?>
+	<?php } ?>
+</p>
+<?php } ?>
+<?php } ?>

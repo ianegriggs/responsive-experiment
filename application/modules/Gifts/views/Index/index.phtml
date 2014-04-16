@@ -1,0 +1,12 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<?php echo $this->widget('pin.widget.grid', array(
+	'filter'=>array(
+		'gift' => 1,
+		'price' => array($this->getRequest()->getRequest('from'),$this->getRequest()->getRequest('to'))
+	),
+	'useIndex' => array('PRIMARY','gift')
+));
+?>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

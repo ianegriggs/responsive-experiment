@@ -1,0 +1,7 @@
+<?php if($users && $users->count()) { ?>
+<ul class="clearfix event-userrepin<?php echo $pin->id;?>-pins">
+	<?php foreach($users AS $user) { ?>
+	<li><a class="event-turbo-click event-history event-width-100 event-no-loader" href="<?php echo $this->url(array('user_id'=>$user->id,'query'=>$user->username),'user');?>"<?php if($popup) { ?> data-popup="true"<?php } ?>><img class="event-load-lazy-load" width="78" height="78" alt="Thumb" src="assets/images/grey.gif" data-original="<?php echo \User\Helper\Avatar::getImage('small', $user)->image;?>" onload="$(this).LazyLoad();" /></a></li>
+	<?php } ?>
+</ul>
+<?php } ?>

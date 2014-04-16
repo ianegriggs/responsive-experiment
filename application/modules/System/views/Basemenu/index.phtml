@@ -1,0 +1,122 @@
+<?php 
+$self = $this;
+$pageMenuTable = new \Base\Menu();
+$widget = $this->widget('widget.grid.db', array(
+	'head' => array(
+		'title' => $this->_('Base menu'),
+	),
+	'atributes' => 'class="display"',
+	'dataProvider' => new \Base\Menu(),
+	'checkbox' => true,
+	'columns' => array(
+		array(
+			'atributes' => 'class="left" style="width:50px;"',
+			'name' => 'id',
+			'label' => '#',
+			'filter' => false,
+			'order' => false
+		),
+		array(
+			'atributes' => 'class="left"',
+			'name' => 'title',
+			'label' => $this->_('Title'),
+			'filter' => false,
+			'order' => false
+		),
+	),
+	'filter' => array(
+		'group_id' => 'BaseMenu'
+	),
+	'has_delete' => false,
+	'has_edit' => false,
+	'nosearch' => true,
+	'add_new' => false,
+	'has_delete_button' => false,
+	'sort' => 'sort_order',
+	'order' => 'ASC',
+	'actionsExtend' => function($data) use($self) {
+		ob_start();
+		?>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$('.add-to-menu').click(function() {
+					$self = $(this);
+					$.post(window.location.href, {toMenu:$self.attr('id').replace('page_','')}, function(json) {
+						if(json.error) {
+							alert(json.error);
+						} else if(json.inMenu === true) {
+							$self.find('img').replaceWith('<img title="<?php echo $self->_('Remove this link from menu');?>" alt="" class="tooltip" src="cms/admin/images/delete2.png">');
+						} else if(json.inMenu === false) {
+							$self.find('img').replaceWith('<img title="<?php echo $self->_('Add this link to menu');?>" alt="" class="tooltip" src="cms/admin/images/add.png">');
+						} else {
+							alert('error');
+						}
+					}, 'json');
+					return false;
+				});
+			});
+		</script>
+		<?php 
+		$self->placeholder('script', ob_get_clean());
+		if($data->status) {
+			return '<a class="add-to-menu" href="javascript:void(0);" id="page_' . $data->id . '"><img title="' . $self->_('Remove this link from menu') . '" alt="" class="tooltip" src="cms/admin/images/delete2.png"></a>';
+		} else {
+			return '<a class="add-to-menu" href="javascript:void(0);" id="page_' . $data->id . '"><img title="' . $self->_('Add this link to menu') . '" alt="" class="tooltip" src="cms/admin/images/add.png"></a>';
+		}
+	},
+	'onPost' => function() use($pageMenuTable, $self) {
+		$id = $self->getRequest()->getPost('toMenu');
+		$result = array();
+		$row = $pageMenuTable->fetchRow($pageMenuTable->makeWhere(array('id' => $id)));
+		try {
+			if($row->status) {
+				$row->status = 0;
+				$row->save();
+				$result['inMenu'] = false;
+			} else {
+				$row->status = 1;
+				$row->save();
+				$result['inMenu'] = true;
+			}
+		} catch (\Core\Exception $e) {
+			$result['error'] = $e->getMessage();
+		}
+		
+		return $result;
+	}
+));
+
+?>
+
+<?php echo $this->getController('admin/layout/header_part'); 
+
+echo $widget;
+
+?>
+
+<?php 
+/*
+$self = $this;
+echo $this->widget('widget.form.phparray', array(
+	'head' => array(
+		'title' => $this->_('Base Settings'),
+	),
+	'columns' => \Base\Config::getGroupForm('config', $this->_),
+	'onSave' => function($values, $widget) use($self) {
+		if(\Base\Config::updateGroup('config', $values)) {
+			if($values['config_autoupdate_currency']) {
+				\Currency\Helper\Format::updateCurrencies(null,true);
+			}
+			return true;
+		} else {
+			$widget->errors = \Base\Config::getErrors();
+		}
+		return false;
+	}
+));
+*/
+?>
+
+
+
+<?php echo $this->getController('admin/layout/footer_part'); ?>

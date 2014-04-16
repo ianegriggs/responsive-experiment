@@ -1,0 +1,23 @@
+<?php 
+if(!$this->getRequest()->isXmlHttpRequest()) {
+	echo $this->getController('home/layout/header_part');
+} else {
+	echo '<div class="popup">
+			<div class="head">
+		<h3 class="title-2 color-1">404</h3>
+	</div>
+	<div class="body">';
+}
+?>
+
+<section id="content">
+	<div class="container">
+		<div class="notfound"><img src="assets/images/404.png" width="770" height="526" alt="404"></div>
+	</div>	
+</section>
+
+<?php 
+if($this->getRequest()->isXmlHttpRequest()) {
+	echo '</div></div>';
+}
+?>

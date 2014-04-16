@@ -1,0 +1,73 @@
+<?php if($location) { $this->redirect($location); exit; } ?>
+<?php if(!$isXmlHttpRequest) {
+	echo $this->getController('home/layout/header_part');
+	echo '<section>';
+} 
+
+$userInfo = \User\User::getUserData();
+?>
+
+<div class="popup">
+	<div class="head">
+		<h3 class="title-2 color-1"><?php echo $this->_('Deactivate Account');?></h3>
+	</div>
+	<div class="body">
+		<?php if($user) { ?>
+		<form action="<?php echo $this->url(array('controller' => 'delete', 'user_id' => $user->id,'query' => $user->username),'user_c');?>" method="post" class="event-delete-user">
+			<?php if($this->errors) { ?>
+			<div class="notification error"><?php echo implode('<br />', $this->errors);?><a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>
+			<?php } ?>
+			<div class="mainform userform">
+				<p class="hide">
+					<input type="hidden" name="X-form-cmd" value="<?php echo $this->x_form_cmd;?>" />
+				</p>
+				
+				<div class="row">
+					<div class="cell">
+						<h2><?php echo $this->_('Are you sure you want to permanently deactivate your account?');?></h2>
+					</div>
+				</div>
+				<div class="submit clearfix">
+					<button type="submit" class="event-loader-delete button button-color-1 button-size-small"><?php echo $this->_('Deactivate Account');?></button><button type="button" class="event-fancybox-close button button-color-2 button-size-small"><?php echo $this->_('Cancel');?></button>
+				</div>
+			</div>
+		</form>
+		<?php } else { ?>
+		<?php if($this->errors) { ?>
+		<div class="notification error"><?php echo implode('<br />', $this->errors);?><a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>
+		<?php } ?>
+		<?php } ?>
+	</div>
+</div>
+<?php if($user) { ?>
+<script type="text/javascript">
+$('.event-delete-user').submit(function(){
+	App.addLoader('.event-loader-delete');
+	$('.notification.error').remove();
+	App._ajax({
+		url: '<?php echo $this->url(array('controller' => 'delete', 'user_id' => $user->id,'query' => $user->username),'user_c');?>',
+		data: $(this).serialize(),
+		type: 'POST',
+		onSuccess: function(json) {
+			App.removeLoader('.event-loader-delete');
+			if(json.location) {
+				window.location = json.location;
+			} else if(json.errors) {
+				var error = '';
+				for( i in json.errors ) {
+					error += json.errors[i] + '<br />';
+				}
+				$('.event-delete-user').prepend('<div class="notification error">' + error + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+			} else {
+				console.log(json);
+			}
+		}
+	});
+	return false;
+});
+</script>
+<?php } ?>
+<?php if(!$isXmlHttpRequest) {
+	echo '<section>';
+	echo $this->getController('home/layout/footer_part');
+} ?>

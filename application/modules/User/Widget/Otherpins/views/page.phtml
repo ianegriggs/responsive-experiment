@@ -1,0 +1,7 @@
+<?php if($pins && $pins->count()) { ?>
+<ul class="clearfix event-user<?php echo $user->id;?>-pins">
+	<?php foreach($pins AS $pin) { ?>
+	<li><a class="event-turbo-click event-history event-width-100 event-no-loader" href="<?php echo $this->url(array('pin_id'=>$pin->id),'pin');?>"<?php if($popup) { ?> data-popup="true"<?php } ?>><img class="event-load-lazy-load" width="78" height="78" alt="Thumb" src="assets/images/grey.gif" data-original="<?php echo \Pin\Helper\Image::getImage('small', $pin)->image;?>" onload="$(this).LazyLoad();" /></a></li>
+	<?php } ?>
+</ul>
+<?php } ?>

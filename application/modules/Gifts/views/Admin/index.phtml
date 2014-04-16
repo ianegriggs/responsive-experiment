@@ -1,0 +1,42 @@
+<?php echo $this->getController('admin/layout/header_part'); ?>
+
+<?php 
+$self = $this;
+echo $this->widget('widget.grid.db', array(
+	'head' => array(
+		'title' => $this->_('Pin gift price filter')
+	),
+	'atributes' => 'class="display"',
+	'dataProvider' => new \Gifts\Gifts(),
+	'checkbox' => true,
+	'columns' => array(
+		array(
+			'atributes' => 'class="left" style="width:50px;"',
+			'name' => 'id',
+			'label' => '#',
+			'order' => false
+		),
+		array(
+			'atributes' => 'class="left"',
+			'name' => 'from',
+			'label' => $this->_('From'),
+			'value' => function($data) {
+				return \Currency\Helper\Format::format($data->from);
+			}
+		),
+		array(
+			'atributes' => 'class="left"',
+			'name' => 'to',
+			'label' => $this->_('To'),
+			'value' => function($data) {
+				return \Currency\Helper\Format::format($data->to);
+			}
+		),
+	),
+	'order' => 'ASC',
+	'sort' => 'from'
+));
+
+?>
+
+<?php echo $this->getController('admin/layout/footer_part'); ?>

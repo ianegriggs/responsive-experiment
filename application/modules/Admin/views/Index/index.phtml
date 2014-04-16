@@ -1,0 +1,271 @@
+<?php echo $this->getController('admin/layout/header_part'); ?>
+  <table width="100%" cellpadding="0" cellspacing="0">
+	<tbody><tr>
+		<td width="49%" valign="top">
+			<br class="mtop25">
+			<div class="info_line top">
+				<h3 class="fleft title mbottom0">
+					<img alt="" src="cms/admin/images/quiz.png">
+					<?php echo $this->_('Statistics');?>				
+				</h3>
+				<div class="clear"></div>
+			</div>
+			
+			<table class="display statistics" cellpadding="0" cellspacing="0">
+				<tbody>
+					<tr>
+						<td><?php echo $this->_('Total users');?></td>
+						<td width="100" class="right" id="user/total"><img src="cms/admin/images/ajax-loader.gif" alt="" /></td>
+					</tr>
+					<tr>
+						<td><?php echo $this->_('Total pins');?></td>
+						<td class="right" id="pin/total"><img src="cms/admin/images/ajax-loader.gif" alt="" /></td>
+					</tr>
+					<tr>
+						<td><?php echo $this->_('Total boards');?></td>
+						<td class="right" id="board/total"><img src="cms/admin/images/ajax-loader.gif" alt="" /></td>
+					</tr>
+					<tr>
+						<td><?php echo $this->_('Total Waiting for invitation');?></td>
+						<td class="right" id="invite/total"><img src="cms/admin/images/ajax-loader.gif" alt="" /></td>
+					</tr>
+					<tr>
+						<td><?php echo $this->_('Total Orders');?></td>
+						<td class="right" id="cart/total"><img src="cms/admin/images/ajax-loader.gif" alt="" /></td>
+					</tr>
+				</tbody>
+			</table>
+			
+		</td>
+		<td width="2%">&nbsp;</td>
+		<td width="49%" valign="top">
+			
+			<?php 
+				$self = $this;
+				echo $this->widget('widget.grid.db', array(
+					'head' => array(
+						'title' => $this->_('Waiting for invitation'),
+						'icon' => 'cms/admin/images/gallery-sml.png'
+					),
+					'atributes' => 'class="display"',
+					'dataProvider' => new \Invite\Invite(),
+					'checkbox' => true,
+					'columns' => array(
+						array(
+							'atributes' => 'class="left" style="width:50px;"',
+							'name' => 'id',
+							'label' => '#',
+							'order' => false
+						),
+						array(
+							'atributes' => 'class="left"',
+							'name' => 'email',
+							'label' => $this->_('Email'),
+							'order' => false
+						),
+						array(
+							'atributes' => 'class="left" style="width:130px;"',
+							'name' => 'date_added',
+							'label' => $this->_('Date'),
+							'order' => false
+						),
+					),
+					'filter' => array(
+						'user_id' => null,
+						'send' => 0
+					),
+					'has_edit' => false,
+					'add_new' => false,
+					'checkbox' => false,
+					'nosearch' => true,	
+					'nopagination' => true,
+					'actionsExtend' => function($invite, $grid) use($self) {
+						return '<a href="' . $self->url(array('action'=>'send', 'module' => 'invite', 'controller' => 'admin', 'query'=>'id='.$invite->id.'&form='.$grid->id), 'admin_module', false, false) . '" class="email" href="javascript:void(0);">
+									<img title="'.$self->_('Invite').'" alt="" class="tooltip" src="cms/admin/images/mail.png">
+								</a>';
+					},
+					'limit' => 5
+				));
+				
+				?>
+			
+		</td>
+	</tr>
+	<?php if(in_array('Cart',array_keys($this->getApplication()->getModules()))) { ?>
+	<tr>
+		<td valign="top" colspan="3" style="padding-top:20px;">
+		
+			<?php 
+			$self = $this;
+			echo $this->widget('widget.grid.db', array(
+				'head' => array(
+					'title' => $this->_('Orders'),
+				),
+				'atributes' => 'class="display"',
+				'dataProvider' => new \Cart\Cart(),
+				'has_delete' => false,
+				'has_edit' => false,
+				'add_new' => false,
+				'checkbox' => false,
+				'nosearch' => true,	
+				'nopagination' => true,
+				'columns' => array(
+					array(
+						'atributes' => 'class="left" style="width:50px;"',
+						'name' => 'id',
+						'label' => '#',
+							'order' => false
+					),
+					array(
+						'atributes' => 'class="left"',
+						'name' => 'title',
+						'label' => $this->_('Title'),
+						'order' => false
+					),
+					array(
+						'atributes' => 'class="left"',
+						'name' => 'action',
+						'label' => $this->_('Module'),
+						'value' => function($data) use($self) {
+							$obj = $self->getFrontController()->formatHelperName('\\'.$data->module.'\Helper\\' . $data->action);
+							return call_user_func(array($obj,'getTitle'));
+						},
+						'order' => false
+					),
+					array(
+						'atributes' => 'class="left"',
+						'name' => 'user_id',
+						'value' => function($data) use($self) { return '<a href="'.$self->url(array('module'=>'user','query'=>'filter[id]='.$data->id),'admin_module',false,false).'">'.$data->username.'</a>'; },
+						'label' => $this->_('User'),
+						'order' => false
+					),
+					array(
+						'atributes' => 'class="left" style="width:60px;"',
+						'name' => 'total',
+						'value' => function($data) use($self) { return \Currency\Helper\Format::format($data->total,$data->currency_code,$data->currency_value); },
+						'label' => $this->_('Total'),
+						'order' => false
+					),
+					array(
+						'atributes' => 'class="left" style="width:100px;"',
+						'name' => 'cart_status_id',
+						'virtual' => array('title' => 'Cart\CartStatusDescription'),
+						'label' => $this->_('Status'),
+						'order' => false
+					),
+					array(
+						'atributes' => 'class="left" style="width:120px;"',
+						'name' => 'date_added',
+						'label' => $this->_('Date added'),
+						'order' => false
+					),
+				),
+				'filter' => array(
+					'cart_status_id' => '>0'
+				),
+				'limit' => 10
+			));
+			
+			?>	
+		
+		</td>
+	</tr>
+	<?php } ?>
+	<tr>
+		<td valign="top" colspan="3" style="padding-top:20px;">
+		
+			<div class="info_line top">
+				<h3 class="fleft title mbottom0">
+					<img alt="" src="cms/admin/images/quiz.png">
+					<?php echo $this->_('Statistics');?>
+				</h3>
+				<div class="fright mtop3">
+					<select id="select_year_chart">
+						<?php for($year=date('Y');$year>2012;$year--) { ?>
+						<option value="<?php echo $year;?>"><?php echo $year;?></option>
+						<?php } ?>
+					</select>
+				</div>
+				<div class="clear"></div>
+			</div>
+			
+			<div id="container_statistic" style="height: 500px;text-align: center;">
+				<img src="cms/admin/images/ajax-loader.gif" alt="" style="margin-top: 150px;" />
+			</div>	
+		
+		</td>
+	</tr>
+</tbody>
+</table>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	$('table.statistics td[id]').each(function(i, item){
+		selector = $(item).attr('id');
+		$.get(new String('<?php echo $this->url(array('module'=>'{MODULE}'),'admin_module',false,false);?>').replace('{MODULE}',selector), function(data){
+			$(item).html(data.total);
+		}, 'json');
+	});
+});
+</script>
+
+<script type="text/javascript" src="cms/admin/assets/highcharts/highcharts.js"></script>
+<script type="text/javascript">
+var chart;
+
+options = {
+		chart: {
+			renderTo: 'container_statistic',
+			type: 'column'
+		},
+		title: {
+			text: ''
+		},
+		subtitle: {
+			text: ''
+		},
+		xAxis: {
+			categories: []
+		},
+		yAxis: {
+			min: 0,
+			title: {
+				text: ''
+			}
+		},
+		legend: {
+			layout: 'vertical',
+			backgroundColor: '#FFFFFF',
+			align: 'left',
+			verticalAlign: 'top',
+			x: 100,
+			y: 70,
+			floating: true,
+			shadow: true
+		},
+		tooltip: {
+			formatter: function() {
+				return ''+ this.x +': '+ this.y;
+			}
+		},
+		plotOptions: {
+			column: {
+				pointPadding: 0.2,
+				borderWidth: 0
+			}
+		},
+		series: [],
+		credits: {enabled:''}
+	}
+
+$(document).ready(function() {
+	$('#select_year_chart').change(function(){
+		$.get('<?php echo $this->url(array(),'admin_chart');?>', {year: this.value}, function(data) {
+			options = $.extend({}, options, data);
+			chart = new Highcharts.Chart(options);
+		}, 'json');
+	}).change();
+});
+</script>
+
+<?php echo $this->getController('admin/layout/footer_part'); ?>

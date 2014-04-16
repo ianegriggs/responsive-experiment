@@ -1,0 +1,120 @@
+<section id="content">
+	<?php if($this->description) { ?>
+	<div class="container">
+		<div class="textbox center">
+			<?php echo nl2br($this->description);?>
+		</div>
+	</div>
+	<?php } ?>
+	<div class="container fluid">
+		<div class="boxcontainer"> </div>
+	</div>
+</section>
+
+<div class="no-results">
+	<div class="container">
+		<p><a class="widget-paginator" id="last-result-0" href="<?php echo $this->getRequest()->getBaseUrl();?>?widget=pin.widget.grid&<?php echo $query;?>"></a></p>	
+	</div>
+</div>
+
+<?php if(!$from_widget) {  ?>
+
+<script type="text/javascript" src="assets/js/jquery.infinitescroll.min.js"></script>
+<script type="text/javascript" src="assets/js/masonry.pkgd.min.js"></script>
+<script type="text/javascript" src="assets/js/jquery.mousewheel-3.0.6.pack.js"></script>
+
+
+<script type="text/javascript">
+$('.boxcontainer').bind('append', function(){
+	$(this).find('img, .event-load-lazy-load').LazyLoad();
+	$('.event-tooltip',this).tipr({
+		'speed': 300,
+		'mode': 'bottom'
+	});
+});
+$('.boxcontainer').masonry({
+	itemSelector : '.box',
+	isFitWidth: true,
+	transitionDuration: 0,
+	columnWidth: 236,
+	gutter: 14,
+	isOriginLeft: <?php echo $this->getModule('Language')->isRtl() ? 'false' : 'true';?>
+}).infscroll({
+	onLoadPage: '<?php echo $this->getRequest()->getBaseUrl();?>?widget=pin.widget.grid&<?php echo $query;?>',
+	url: function(){ return $('.widget-paginator').attr('href'); },
+	offset: function() { return Math.ceil(Math.max($(window).height()*2,($(document).height()/1.5))); },
+	loadingAppendTo: $('#content .container:has(.boxcontainer)'),
+	onSuccess: function(response){
+		var section = $(response);
+		var elements = section.find('.box');
+		var paginator = section.find('.widget-paginator');
+		if(paginator.size()) {
+			$('.widget-paginator').replaceWith(paginator);
+		} else {
+			$('.widget-paginator').remove();
+		}
+		if(!paginator.attr('href')) {
+			paginator.parents('section').removeClass('hide');
+		}
+		if(elements.size()) {
+			$('.boxcontainer').append(elements)
+				.masonry( 'appended', elements )
+					//.find('img').LazyLoad();
+		} else {
+			$('.boxcontainer').infscroll('destroy');
+		}
+		<?php /* ?>
+		$('.box .description:not(.scrolled)').each(function() {
+			var scheight = $(this).addClass('scrolled').outerHeight(true);
+			var height = $('.scroll', this).outerHeight(true);
+			if(scheight < height) {
+				$(this).prepend('<div class="trackbar"></div><div class="scrollbar"></div>').data('customscroll',true);
+			}
+		}).mousewheel(function(e) {
+			if( $(this).data('customscroll') ) {
+				var o = e.originalEvent;
+				var delta = o && (o.wheelDelta || (o.detail && -o.detail));
+				var scrollbar = $('.scrollbar',this);
+				var scrPos = scrollbar.position().top;
+				var maxBottom = $(this).outerHeight(true) - scrollbar.outerHeight(true);
+				if( delta ) {
+					e.preventDefault();
+					if(delta < 0) {
+						scrPos = scrPos + 15;
+						if(scrPos >= maxBottom) {
+							scrPos = maxBottom;
+						}
+					} else {
+						scrPos = scrPos - 15;
+						if(scrPos <=0) {
+							scrPos = 0;	
+						}
+					}
+					scrollbar.stop(true,true).animate({'top': scrPos}, 10, function() {
+						dragging(scrollbar);
+					});
+				}
+			}
+		}).find('.scrollbar').draggable({
+			axis: 'y',
+			containment: 'parent',    
+			drag: function() {
+				 dragging(this)
+			}
+		});
+		
+		function dragging(self) {
+			var scrPos = $(self).position().top;   
+			var scheight = $(self).parents('.description').outerHeight(true);
+			var sheight = $(self).outerHeight(true);
+			var height = $(self).parents('.description').find('.scroll').outerHeight(true) - scheight;
+			var tbdef = scheight - $(self).parents('.description').find('.padwrapper').outerHeight(true);
+			var step = ((scrPos/((scheight-sheight)-tbdef)) * 100);
+			$('.scroll', $(self).parents('.description')).css({top: -((height/100)*step)});
+		}
+		<?php */ ?>
+		
+	}
+});
+</script>
+<?php } ?>

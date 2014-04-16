@@ -1,0 +1,107 @@
+<?php if($location) { ?>
+<script type="text/javascript">
+window.location = '<?php echo $location;?>';
+</script>
+<?php ecit;?>
+<?php } ?>
+<?php if(!$isXmlHttpRequest) {
+	echo $this->getController('home/layout/header_part');
+}  ?>
+<?php $userInfo = \User\User::getUserData();?>
+<div class="popup">
+	<div class="head">
+		<h3 class="title-2 color-1"><?php echo $this->_('Gallery Pin');?></h3>
+	</div>
+	<div class="body">
+		<form action="<?php echo $this->url(array('controller' => 'create-pin'),'urlpin_c');?>" method="post" id="event-form-create-pin">
+			<p class="hide">
+				<input type="hidden" name="X-form-cmd" value="<?php echo $this->x_form_cmd;?>" />
+				
+				<?php if($this->redirect) { ?>
+				<input type="hidden" name="redirect" value="<?php echo $this->redirect;?>" />
+				<?php } ?>
+			</p>
+			<div class="mainform pinform">
+				<div class="row">
+					<div class="cell cell-addpin clearfix">
+						
+						<div class="drag-sort">
+							<ul class="event-drag-sort">
+							<?php foreach($files AS $key => $image) { ?>
+							<li class="avatar media media_<?php echo $key;?>" style="background-image: url(<?php echo $image;?>);"> 
+								<input type="hidden" value="<?php echo $image;?>" name="gallery[]" />
+							</li>
+							<?php } ?>
+							</ul>
+							<div class="clear"></div>
+						</div>
+						
+						<div class="data">
+							<select id="create-pin6" name="board_id" class="event-board-init">
+								<option value=""><?php echo $this->_('Choose Board');?></option>
+								<?php foreach($boards AS $board) { ?>
+								<option value="<?php echo $board->id;?>"><?php echo $board->title;?> <?php if($userInfo->id != $board->user_id) { echo $this->_('(Shared)');}?></option>
+								<?php } ?>
+							</select>
+							<textarea id="create-pin7" name="description" placeholder="<?php echo $this->_('Description');?>"></textarea>
+						</div>	
+					</div>
+					<?php if($this->errors) { ?>
+					<div class="notification error"><?php echo implode('<br />', $this->errors)?><a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>
+					<?php } ?>
+				</div>
+				<div class="submit tright">
+					<button class="event-loader button button-color-1 button-size-small"><?php echo $this->_('Pin It');?></button><button class="event-fancybox-close button button-color-2 button-size-small"><?php echo $this->_('Cancel');?></button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+$.fancybox.reposition();
+$('#event-form-create-pin').submit(function(){
+	App.addLoader('#event-form-create-pin .event-loader');
+	$('.notification.error').remove();
+	App._ajax({
+		url: '<?php echo $this->url(array('controller' => 'create-pin'),'gallerypin_c');?>',
+		onSuccess: function(json) { 
+			App.removeLoader('#event-form-create-pin .event-loader');
+			if(json.location) {
+				window.location = json.location;
+			} else if(json.errors) {
+				var error = '';
+				for( i in json.errors ) {
+					error += json.errors[i] + '<br />';
+				}
+				$('#event-form-create-pin .row:first').append('<div class="notification error">' + error + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+			} else if(json.pin) {
+				window.location = json.pin;
+				/*var link = $('<a>').attr('href', json.pin).addClass('event-fancybox-ajax event-history event-width-100');
+				link.appendTo('body').click().remove();*/
+			} else {
+				console.log(json);
+			}
+		},
+		type: 'POST',
+		data: $(this).serialize()
+	});
+	return false;
+});
+App.selectBoxWithBoard({
+	url :'<?php echo $this->url(array(),'createboard_simple');?>',
+	create:'<?php echo $this->escape($this->_('Create'));?>',
+	close:'<?php echo $this->escape($this->_('Close'));?>',
+	placeholder:'<?php echo $this->escape($this->_('Create New Board'));?>',
+	chose_category:'<?php echo $this->escape($this->_('Choose a Category'));?>',
+	categories: <?php echo \Core\Encoders\Json::encode( \Category\Category::getCategoryTreeSelect() );?>
+});
+Turbo.head({
+	js: ['assets/js/jquery.dragsort.js'],
+	callback: function() {
+		$(".event-drag-sort").dragsort({ itemSelector: ".media",dragSelector: ".media", placeHolderTemplate: "<"+"li class='media'><"+"/li>" });
+	}
+});
+</script>
+<?php if(!$isXmlHttpRequest) {
+	echo $this->getController('home/layout/footer_part');
+} ?>

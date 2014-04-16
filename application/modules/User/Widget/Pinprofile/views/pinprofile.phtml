@@ -1,0 +1,20 @@
+<?php if($user) { ?>
+<?php $self_data = \User\User::getUserData(); ?>
+<div class="whitebox">
+	<div class="user event-stats-user-<?php echo $user->id;?>">
+		<a href="<?php echo $this->url(array('user_id' => $user->id,'query'=>$user->username),'user');?>" class="avatar"><img class="event-load-lazy-load" data-original="<?php echo \User\Helper\Avatar::getImage('medium', $user)->image;?>" src="assets/images/grey.gif" width="200" height="200" alt="Avatar" onload="$(this).LazyLoad();" /></a>
+		<h3 class="title-5"><a href="<?php echo $this->url(array('user_id' => $user->id,'query'=>$user->username),'user');?>"><?php echo $user->getUserFullname();?></a></h3>
+		<p class="meta-text"><?php echo sprintf($this->_('%s pins &nbsp; %s boards'),'<span class="num event-pins">'.$user->pins.'</span>','<span class="num event-boards">'.$user->boards.'</span>')?></p>
+		<?php if($self_data->id != $user->id) { ?>
+		<?php if($user->following_user) { ?>
+		<p><a data-userid="<?php echo $user->id;?>" href="<?php echo $this->url(array('user_id' => $user->id,'controller'=>'follow','query'=>$user->username),'user_c');?>" class="event-follow-user button button-color-2 button-size-small" data-textactive="<?php echo $this->_('Unfollow');?>" data-textinactive="<?php echo $this->_('Follow');?>"><?php echo $this->_('Unfollow');?></a></p>
+		<?php } else if($self_data->id) { ?>
+		<p><a data-userid="<?php echo $user->id;?>" href="<?php echo $this->url(array('user_id' => $user->id,'controller'=>'follow','query'=>$user->username),'user_c');?>" class="event-follow-user button button-color-1 button-size-small" data-textactive="<?php echo $this->_('Unfollow');?>" data-textinactive="<?php echo $this->_('Follow');?>"><?php echo $this->_('Follow');?></a></p>
+		<?php } else { ?>
+		<p><a href="<?php echo $this->url(array('controller' => 'login', 'query' => '?next=' . urlencode($this->url(array('user_id' => $user->id,'query'=>$user->username),'user'))),'user_c',false,false);?>" class="button button-color-1 button-size-small"><?php echo $this->_('Follow');?></a></p>
+		<?php } ?>
+		<?php } ?>
+		<p class="meta-text"><?php echo sprintf($this->_('%s Followers'),'<span class="num event-followers">'.$user->followers.'</span>');?></p>
+	</div>
+</div>
+<?php } ?>

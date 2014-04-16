@@ -1,0 +1,45 @@
+<?php echo $this->getController('admin/layout/header_part'); ?>
+
+<?php 
+$self = $this;
+$recordTable = new \Gifts\Gifts();
+$record = $recordTable->fetchRow($recordTable->makeWhere(array('id' => $this->getRequest()->getRequest('id'))));
+echo $this->widget('widget.form.phparray', array(
+	'head' => array(
+		'title' => $this->_('Pin gift price filter')
+	),
+	'columns' => array(
+		array(
+				'name' => 'from',
+				'label' => $this->_('From'),
+				'type' => 'Number',
+				//'required' => true,
+				'value' => $record?$record->from:'',
+		),
+		array(
+				'name' => 'to',
+				'label' => $this->_('To'),
+				'type' => 'Number',
+				//'required' => true,
+				'value' => $record?$record->to:'',
+		),
+	),
+	'onSave' => function($values, $widget) use($self, $record, $recordTable) {
+		if(!$record) {
+			$record = $recordTable->fetchNew();
+		}
+		$record->from = $values['from'];
+		$record->to = $values['to'];
+		try {
+			$record->save();
+			return true;
+		} catch (\Core\Exception $e) {
+			$widget->errors = $e->getMessage();
+		}
+		return false;
+	}
+));
+
+?>
+
+<?php echo $this->getController('admin/layout/footer_part'); ?>

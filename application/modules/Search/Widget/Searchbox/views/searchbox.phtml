@@ -1,0 +1,22 @@
+<?php 
+	$query_search = $this->escape($this->getRequest()->getRequest('query')); 
+	$menu = \Base\Menu::getMenuRoutes('SearchMenu');
+	$route = 'search_pin';
+	if(in_array('search_' . $this->getRequest()->getModule(), $menu)) {
+		$route = 'search_' . $this->getRequest()->getModule();
+	}
+?>
+<div class="search">
+	<form action="<?php echo $this->url(array(), $route);?>" method="get" class="event-search-form">
+		<input type="text" name="query" value="<?php /*echo $query_search;*/ ?>" />
+		<input type="submit" />
+	</form>
+</div>
+<script type="text/javascript">
+$('.event-search-form').submit(function() {
+	var value = $('input[name=query]',this).val();
+	if(value.length < 2) {
+		return false;
+	}
+});
+</script>

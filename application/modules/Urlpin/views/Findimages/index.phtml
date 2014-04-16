@@ -1,0 +1,54 @@
+<section id="content">
+	<div class="container small">
+		<form action="<?php echo $this->url(array('controller' => 'find-images'),'urlpin_c');?>" method="post" class="event-find-images">
+			<div class="mainform pinform">
+				<div class="notification success no-mtop"><?php echo $this->_('Check out our bookmarklet to make pinning from a website even easier!');?></div>
+				<div class="row">
+					<div class="cell">
+						<input type="text" placeholder="http://yoursite.com" class="large-with-button" id="f-8" name="url" value="<?php echo $url;?>" /><button type="submit" class="event-loader button button-color-1"><?php echo $this->_('Find Images');?></button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="container">
+		<div class="find-images clearfix">
+			<ul>
+				<?php foreach($images AS $image) { ?>
+				<li class="image-box" style="background-image: url(<?php echo $image['src'];?>)"><a class="event-fancybox-ajax" href="<?php echo $this->url(array('controller' => 'create-pin', 'query' => '?media=' . urlencode($image['src']) . '&description=' . urlencode($image['title']). '&url=' . urlencode(isset($image['href'])?$image['href']:$url)),'urlpin_c', false, false);?>"><span class="select-item"><button class="button button-color-1 button-size-small"><?php echo $this->_('Add Image');?></button></span></a></li>
+				<?php } ?>
+			</ul>
+		</div>
+	</div>
+	
+	<script type="text/javascript">
+		$('.event-find-images').submit(function(){
+			App.addLoader('.event-loader');
+			$('.notification.error').remove();
+			App._ajax({
+				url: '<?php echo $this->url(array('controller' => 'find-images'),'urlpin_c');?>',
+				onSuccess: function(json) {
+					App.removeLoader('.event-loader');
+					if(json.location) {
+						window.location = json.location;
+					} else if(json.errors) {
+						var error = '';
+						for( i in json.errors ) {
+							error += json.errors[i] + '<br />';
+						}
+						$('.find-images').remove();
+						$('.event-find-images .row:first').append('<div class="notification error">' + error + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+					} else if(json.html) {
+						$('section').remove();
+						$('body').append(json.html);
+					} else {
+						//console.log(json);
+					}
+				},
+				type: 'POST',
+				data: $(this).serialize()
+			});
+			return false;
+		});
+	</script>
+</section>

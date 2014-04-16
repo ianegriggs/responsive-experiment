@@ -1,0 +1,17 @@
+<?php if($activity) { ?>
+<article class="box box-activity">
+	<div class="recent-activity">
+		<h3 class="title-7"><?php echo $this->_('Recent Activity');?></h3>
+		<ul>
+			<?php foreach($activity AS $act) { ?>
+			<?php $date = new \Date\Helper\Diff($act->date_added, time()); ?>
+			<li>
+				<p class="member"><a href="#"><img width="60" height="60" alt="Avatar" data-original="<?php echo \User\Helper\Avatar::getImage('small', $act)->image;?>" src="assets/images/grey.gif"></a></p>
+				<p class="text"><a href="#"><strong><?php echo $act->getUserFullname();?></strong></a> aded to <a href="#"><strong>Sauce</strong></a></p>
+				<p class="meta-text"><?php echo sprintf($this->_('%d %s ago'),$date->getSingle()->value, $this->_($date->getSingle()->key));?></p>
+			</li>
+			<?php } ?>
+		</ul>
+	</div>
+</article>
+<?php } ?>

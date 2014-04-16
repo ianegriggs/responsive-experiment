@@ -1,0 +1,263 @@
+<?php if(!$isXmlHttpRequest) {
+	echo $this->getController('home/layout/header_part');
+}  ?>
+<?php $self_data = \User\User::getUserData(); ?>
+<?php $media = new \Media\Helper\UrlInfo();?>
+
+<div id="event-content">
+	<section class="bgcolor-1" id="headbar">
+		<div class="container">
+			<div class="searchbar clearfix">
+				<ul class="pinicons fleft event-stats-<?php echo $pin->id;?>">
+					<?php if($self_data->id) { ?>
+					<li><a href="<?php echo $this->url(array('controller'=>'repin', 'pin_id'=>$pin->id,'query'=>$this->urlQuery($pin->title)),'pin_c');?>" class="event-tooltip event-fancybox-ajax event-repins icon-pinpage-pin" title="<?php echo $this->_('Repin'); ?>"><?php echo $pin->repins;?></a></li>
+					<li><a href="<?php echo $this->url(array('controller'=>'like', 'pin_id'=>$pin->id,'query'=>$this->urlQuery($pin->title)),'pin_c');?>" class="event-tooltip event-like-click event-likes icon-pinpage-like <?php if($isliked) { ?>active<?php } ?>" title="<?php echo $this->_('Like'); ?>"><?php echo $pin->likes;?></a></li>
+					<?php } else { ?>
+					<li><a href="<?php echo $this->url(array('controller' => 'login', 'query' => '?next=' . urlencode($this->url(array('pin_id'=>$pin->id,'query'=>$this->urlQuery($pin->title)),'pin'))),'user_c',false,false);?>" class="event-tooltip icon-pinpage-pin" title="<?php echo $this->_('Repin'); ?>"><?php echo $pin->repins;?></a></li>
+					<li><a href="<?php echo $this->url(array('controller' => 'login', 'query' => '?next=' . urlencode($this->url(array('pin_id'=>$pin->id,'query'=>$this->urlQuery($pin->title)),'pin'))),'user_c',false,false);?>" class="event-tooltip icon-pinpage-like" title="<?php echo $this->_('Like'); ?>"><?php echo $pin->likes;?></a></li>
+					<?php } ?>
+					<?php if($pin->source_id) { ?>
+					<li><a class="event-tooltip icon-pinpage-language" href="<?php echo $pin->from;?>" onclick="target='_blank'" title="<?php echo $this->escape(sprintf($this->_('Pinned from %s'), $pin->from));?>"><?php echo sprintf($this->_('Pinned from %s'), $pin->from);?></a></li>
+					<?php } ?>
+					
+					<li>
+						<a class="icon-pinpage-1 event-addthis-button-<?php echo $pin->id;?>" href="javascript:;" addthis:url="<?php echo $this->url(array('pin_id' => $pin->id),'pin');?>" addthis:title="<?php echo $pin->description;?>">&nbsp;</a>
+						<nav class="dropdown">
+							<div class="dropdown-wrapper arrow-up-left">
+								<ul class="event-addthis-buttons">
+									<li><a class="addthis_button_facebook" addthis:url="<?php echo $this->url(array('pin_id' => $pin->id),'pin');?>" addthis:title="<?php echo $pin->description;?>"><?php echo $this->_('Facebook'); ?></a></li>
+									<li><a class="addthis_button_twitter" addthis:url="<?php echo $this->url(array('pin_id' => $pin->id),'pin');?>" addthis:title="<?php echo $pin->description;?>"><?php echo $this->_('Twitter'); ?></a></li>
+									<li><a class="addthis_button_linkedin" addthis:url="<?php echo $this->url(array('pin_id' => $pin->id),'pin');?>" addthis:title="<?php echo $pin->description;?>"><?php echo $this->_('LinkedIn'); ?></a></li>
+									<li><a class="addthis_button_google" addthis:url="<?php echo $this->url(array('pin_id' => $pin->id),'pin');?>" addthis:title="<?php echo $pin->description;?>"><?php echo $this->_('Google'); ?></a></li>
+									<li><a class="addthis_button_tumblr" addthis:url="<?php echo $this->url(array('pin_id' => $pin->id),'pin');?>" addthis:title="<?php echo $pin->description;?>"><?php echo $this->_('Tumblr'); ?></a></li>
+									<li><a class="addthis_button_blogger" addthis:url="<?php echo $this->url(array('pin_id' => $pin->id),'pin');?>" addthis:title="<?php echo $pin->description;?>"><?php echo $this->_('Blogger'); ?></a></li>
+									<li><a class="addthis_button_delicious" addthis:url="<?php echo $this->url(array('pin_id' => $pin->id),'pin');?>" addthis:title="<?php echo $pin->description;?>"><?php echo $this->_('Delicious'); ?></a></li>
+									<li><a class="addthis_button_email" addthis:url="<?php echo $this->url(array('pin_id' => $pin->id),'pin');?>" addthis:title="<?php echo $pin->description;?>"><?php echo $this->_('Email'); ?></a></li>
+									<li><a class="addthis_button_gmail" addthis:url="<?php echo $this->url(array('pin_id' => $pin->id),'pin');?>" addthis:title="<?php echo $pin->description;?>"><?php echo $this->_('Gmail'); ?></a></li>
+									<li><a class="addthis_button_more" addthis:url="<?php echo $this->url(array('pin_id' => $pin->id),'pin');?>" addthis:title="<?php echo $pin->description;?>"><?php echo $this->_('More...'); ?></a></li>
+								</ul>
+							</div>
+						</nav>
+					</li>
+				
+				</ul>
+				<?php $date = new \Date\Helper\Diff($pin->date_added, time()); ?>
+				<p class="meta-text-2 pin-meta-text fleft"><?php echo sprintf($this->_('%s %d %s ago'), $this->_($pin->pinned_from),$date->getSingle()->value, $this->_($date->getSingle()->key));?></p>
+				<p class="pinnavigator fright">
+
+					<?php if($prev_pin) { ?>
+					<a class="event-tooltip button button-color-1 button-size-small button-prev event-turbo-click event-prev" href="<?php echo $this->url(array('pin_id' => $prev_pin->id,'query'=>$this->urlQuery($prev_pin->title)),'pin');?>"<?php if($popup) { ?> data-popup="true"<?php } ?> title="<?php echo $this->_('Prev pin'); ?>">&nbsp;</a>
+					<?php } else { ?>
+					<a class="event-tooltip button button-color-2 button-size-small button-prev" title="<?php echo $this->_('Prev pin'); ?>">&nbsp;</a>
+					<?php } ?>
+					<?php if($next_pin) { ?>
+					<a class="event-tooltip button button-color-1 button-size-small button-next event-turbo-click event-next" href="<?php echo $this->url(array('pin_id' => $next_pin->id,'query'=>$this->urlQuery($next_pin->title)),'pin');?>"<?php if($popup) { ?> data-popup="true"<?php } ?> title="<?php echo $this->_('Next pin'); ?>">&nbsp;</a>
+					<?php } else { ?>
+					<a class="event-tooltip button button-color-2 button-size-small button-next" title="<?php echo $this->_('Next pin'); ?>">&nbsp;</a>
+					<?php } ?>
+					<?php if($popup) { ?>
+					<a class="fancybox-close-pin event-popup-close" href="javascript:;"><img alt="" src="assets/images/fancybox/fancybox_close.png"></a>
+					<?php } ?>
+				</p>
+				<ul class="pinicons fright">
+					<?php if(isset($routes)) { ?>
+					<?php foreach($routes AS $key => $d) { ?>
+					<li><a class="icon-pinpage-<?php echo $d['route'];?> event-tooltip" href="<?php echo $this->url(array('pin_id'=>$pin->id),$d['route']);?>" title="<?php echo $d['label'];?>"><?php echo $d['label'];?></a></li>
+					<?php } ?>
+					<?php }?>
+					<?php if($self_data->id && ($self_data->id == $pin->user_id || $self_data->is_admin)) { ?>
+					<li><a class="event-tooltip event-fancybox-ajax icon-pinpage-edit" href="<?php echo $this->url(array('controller'=>'edit', 'pin_id'=>$pin->id,'query'=>$this->urlQuery($pin->title)),'pin_c');?>" title="<?php echo $this->_('Edit'); ?>"><?php echo $this->_('Edit');?></a></li>
+					<?php } ?>
+					<li><a class="event-tooltip event-fancybox-ajax icon-pinpage-bell" href="<?php echo $this->url(array('controller'=>'report', 'pin_id'=>$pin->id,'query'=>$this->urlQuery($pin->title)),'pin_c');?>" title="<?php echo $this->_('Report pin'); ?>"><?php echo $this->_('Report pin');?></a></li>
+				</ul>	
+			</div>	
+		</div>
+	</section>
+	
+	<section id="content">
+		<div class="container">
+			
+			<?php 
+			if($this->allow('Banner') && in_array('Banner',array_keys($this->getApplication()->getModules()))) {
+				echo $this->widget('banner.widget.pinprofile', array(
+					'module' => 'pinTop',
+					'limit' => 1		
+				));
+			}
+			?>
+			
+			<div class="pin clearfix">
+				<div class="pin-body">
+					<?php if(isset($labels)) { ?>
+					<?php foreach($labels AS $d) { ?>
+					<span class="ribbon-red ribbon-<?php echo $d['class'];?>"><span class="txt"><?php echo $d['label'];?></span></span>
+					<?php } ?>
+					<?php } ?>
+					<?php if(isset($badges)) { ?>
+					<?php foreach($badges AS $d) { ?>
+					<span class="event-tooltip icon-<?php echo $d['class'];?>" title="<?php echo $d['label'];?>">&nbsp;</span>
+					<?php } ?>
+					<?php } ?>
+					<p class="photo">
+						<?php if($pin->price) { ?>
+						<span class="ribbon-black"><?php echo $pin->getPrice();?></span>
+						<?php } ?>
+						<?php if($pin->video && $media->parseUrl($pin->from)) { ?>
+						<?php 
+						$media->setWidth(676);
+						$media->setHeight(480);
+						echo $media->getEmbedCode();
+						?>
+						<?php } else { ?>
+						<?php 
+						$medium = \Pin\Helper\Image::getImage('medium', $pin);
+						$image = \Pin\Helper\Image::getImage('big', $pin);
+						?>
+						<?php if($pin->source_id) { ?>
+						<a href="<?php echo $pin->from;?>" onclick="target='_blank'"><img class="event-gallery-change-onclick" alt="<?php echo $pin->description;?>" src="<?php echo $medium->image;?>" data-original="<?php echo $image->image;?>" width="<?php echo $image->width;?>" height="<?php echo $image->height;?>" /></a>
+						<?php } else { ?>
+						<img class="event-gallery-change-onclick" alt="<?php echo $pin->description;?>" src="<?php echo $medium->image;?>" data-original="<?php echo $image->image;?>" width="<?php echo $image->width;?>" height="<?php echo $image->height;?>" />
+						<?php } ?>
+						<?php } ?>
+					</p>
+					<?php if(!$pin->video && $gallery && $gallery->count()) { ?>
+					<div class="jcarousel-wrapper">
+						<div class="event-gallery jcarousel">
+							<ul>
+								<?php 
+									$thumb = \Pin\Helper\Image::getImage('small', $pin);
+									$big = \Pin\Helper\Image::getImage('big', $pin);
+								?>
+								<li>
+									<a href="<?php echo $big->image;?>"><img class="thumb" src="<?php echo $thumb->image;?>" alt="<?php echo $pin->description;?>" /></a>
+								</li>
+								<?php foreach($gallery AS $image) { ?>
+								<?php 
+									$thumb = \Pin\Helper\Gallery::getImage('small', $image);
+									$big = \Pin\Helper\Gallery::getImage('big', $image);
+								?>
+								<li>
+									<a href="<?php echo $big->image;?>"><img class="thumb" src="<?php echo $thumb->image;?>" alt="<?php echo $pin->description;?>" /></a>
+								</li>
+								<?php } ?>
+							</ul>
+						</div>
+						<a href="javascript:;" class="jcarousel-control-prev">&lsaquo;</a>
+                		<a href="javascript:;" class="jcarousel-control-next">&rsaquo;</a>
+					</div>
+					<?php } ?>
+					
+					<?php 
+					if($this->allow('Banner') && in_array('Banner',array_keys($this->getApplication()->getModules()))) {
+						echo $this->widget('banner.widget.pinprofile', array(
+							'module' => 'pinBottom',
+							'limit' => 1		
+						));
+					}
+					?>
+					
+					<div class="padding-3">
+						<div class="description">
+							<p><?php echo nl2br(\Pin\Helper\Description::tag($pin->description, $pin_tags)); ?></p>
+							<?php if($pin_tags) { ?>
+							<p class="tags">
+								<?php foreach($pin_tags AS $tag) { ?>
+								<a href="<?php echo $this->url(array('query'=>$tag),'search_pin');?>">#<?php echo htmlspecialchars ( $tag, ENT_QUOTES, 'utf-8' );?></a> 
+								<?php } ?>
+							</p> 
+							<?php } ?>
+						</div>
+						<?php echo $this->widget('pin.widget.comment', array(
+							'pin' => $pin
+						)); ?>
+						
+					</div>
+				</div>
+				<aside class="pin-bar">
+					
+					<?php 
+						$menu = \Base\Menu::getMenu('PinViewRight');
+						if($menu) {
+							foreach($menu AS $widget) {
+								if($widget->is_widget) {
+									$config = array();
+									if($widget->config) {
+										$config = unserialize($widget->config);
+									}
+									$config['instance'] = $widget;
+									$config['pin'] = $pin;
+									$config['module'] = $this->getRequest()->getModule();
+									echo $this->widget($widget->widget, $config);
+								}
+							}
+						}
+					?>
+					
+					
+				</aside>
+			</div>	
+		</div>
+	</section>
+	
+	<script type="text/javascript">
+	$('img').LazyLoad();
+	$('.event-tooltip').tipr({
+		'speed': 0,
+		'mode': 'bottom'
+	});
+
+	<?php if(!$pin->video && $gallery && $gallery->count()) { ?>
+	head.js(
+		{'jcarousel': 'assets/js/jquery.jcarousel.min.js'},
+		function() {
+			var jcarousel = $('.event-gallery').jcarousel();
+			$('.jcarousel-control-prev')
+	            .on('jcarouselcontrol:active', function() {
+	                $(this).removeClass('inactive');
+	            })
+	            .on('jcarouselcontrol:inactive', function() {
+	                $(this).addClass('inactive');
+	            })
+	            .jcarouselControl({
+	                target: '-=1'
+	            });
+ 
+        	$('.jcarousel-control-next')
+	            .on('jcarouselcontrol:active', function() {
+	                $(this).removeClass('inactive');
+	            })
+	            .on('jcarouselcontrol:inactive', function() {
+	                $(this).addClass('inactive');
+	            })
+	            .jcarouselControl({
+	                target: '+=1'
+	            });
+		}
+	);
+	$('.event-gallery ul li a').click(function() {
+		var holder = $('.event-gallery-change-onclick');
+		var width = holder.width();
+	    var self = $(this);
+		var thumb = self.find('.thumb');
+		App.addLoader(self);
+	    var img = new Image;
+	    img.src = this.href;
+		thumb.addClass('transparent');
+	    $(img).load(function() {
+		    height = Math.round(this.height / (this.width/width));
+	        holder.animate({width: width, height: height, opacity: 0.5}, 150, function() {
+	            holder.attr('src', img.src).animate({opacity: 1}, 150, function() {
+	            	App.removeLoader(self);
+					thumb.removeClass('transparent');
+	            });
+	        })
+	    });
+	    return false;
+	});
+	<?php } ?>
+	</script>
+</div>
+
+<?php if(!$isXmlHttpRequest) {
+	echo $this->getController('home/layout/footer_part');
+} ?>

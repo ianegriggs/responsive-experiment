@@ -1,0 +1,189 @@
+<?php 
+if( ($total_pins = $pins->count() ) > 0 ) { 
+	$self_data = \User\User::getUserData(); 
+	try {
+		if($this->allow('Banner') && in_array('Banner',array_keys($this->getApplication()->getModules()))) {
+			$bannersTable = new \Banner\Banner();
+			$banners = $bannersTable->getBannersBySortOptions($this->options);
+		}
+	} catch (\Core\Exception $e) {}
+	?>
+	<section id="content">
+		<div class="container fluid">
+			<div class="boxcontainer">
+			
+			<?php if($this->createNewPin && $this->options['fromRow'] === 0) { ?>
+			<article class="box empty">
+				<div class="box-body">
+					<div class="overflowhidden">
+						<p class="thumb event-tooltip" title="<?php echo $this->escape($this->_('Add a Pin'));?>"><a class="event-fancybox-ajax" href="<?php echo $this->url(array('controller'=>'create'),'pin_c');?>"><img class="event-load-lazy-load" style="width:236px;height:298px;" data-original="assets/images/empty-pin.png" src="assets/images/grey.gif" alt="Pin"></a></p>
+						<p class="stats">
+							<span class="cell"><strong class="num event-repins">0</strong> <?php echo $this->_('repins');?></span>
+							<span class="cell"><strong class="num event-likes">0</strong> <?php echo $this->_('likes');?></span>
+							<span class="cell"><strong class="num event-comments">0</strong> <?php echo $this->_('comments');?></span>
+						</p>
+					</div>
+				</div>
+			</article>
+			<?php } ?>
+			
+			<?php /*if($self_data->id && $this->options['fromRow'] === 0) { ?>
+			<?php echo $this->widget('activity.widget.homebox');?>
+			<?php } */?>
+			
+			<?php foreach($pins AS $r => $pin) { ?>
+				
+				<?php
+					//banners
+					if(isset($banners) && isset($banners[ $this->options['fromRow'] + $r ])) {
+						$this->render('gridBanners', array('banners' => $banners[ $this->options['fromRow'] + $r ]));
+					}
+				?>
+				
+				<article class="box box-<?php echo $pin->id;?>">
+					<?php if(isset($labels[$pin->id])) { ?>
+					<?php foreach($labels[$pin->id] AS $d) { ?>
+					<span class="ribbon-red ribbon-<?php echo $d['class'];?>"><span class="txt"><?php echo $d['label'];?></span></span>
+					<?php } ?>
+					<?php } ?>
+					<?php if(isset($badges[$pin->user_id])) { ?>
+					<?php foreach($badges[$pin->user_id] AS $d) { ?>
+					<span class="icon-<?php echo $d['class'];?>" title="<?php echo $d['label'];?>">&nbsp;</span>
+					<?php } ?>
+					<?php } ?>
+					<?php if($pin->video) { ?>
+					<a class="ribbon-video event-popup-ajax" href="<?php echo $this->url(array('pin_id'=>$pin->id),'pin');?>">&nbsp;</a>
+					<?php } ?>
+					<?php if(isset($routes[$pin->id])) { ?>
+					<?php foreach($routes[$pin->id] AS $key => $d) { ?>
+					<a class="ribbon-<?php echo $d['route'];?> event-tooltip" href="<?php echo $this->url(array('pin_id'=>$pin->id),$d['route']);?>" title="<?php echo $d['label'];?>"><?php echo $d['label'];?></a>
+					<?php } ?>
+					<?php } ?>
+					
+					<input type="checkbox" id="checkbox-description-<?php echo $pin->id;?>" class="checkbox-description hide" />
+					<div class="box-body">
+						<?php /* ?>
+						<label class="button-more" for="checkbox-description-<?php echo $pin->id;?>"><?php echo $this->_('More');?></label>
+						<?php */ ?>
+						<nav class="dropdown">
+							<div class="dropdown-wrapper arrow-up-left block">
+								<h3 class="title-8"><a href="<?php echo $this->url(array('user_id' => $pin->user_id,'query'=>$pin->username),'user');?>"><?php echo $pin->getUserFullname();?></a></h3>
+								<ul class="memberdata stronglinks event-stats-user-<?php echo $pin->user_id;?>">
+									<li><a href="<?php echo $this->url(array('user_id' => $pin->user_id,'controller'=>'pin','query'=>$pin->username),'user_c');?>"><span class="num event-pins"><?php echo $pin->pins;?></span> <?php echo $this->_('View all Pins');?></a></li>
+									<li><a href="<?php echo $this->url(array('user_id' => $pin->user_id,'controller'=>'board','query'=>$pin->username),'user_c');?>"><span class="num event-boards"><?php echo $pin->boards;?></span> <?php echo $this->_('View all Boards');?></a></li>
+									<li><a href="<?php echo $this->url(array('user_id' => $pin->user_id,'controller'=>'like','query'=>$pin->username),'user_c');?>"><span class="num event-likes"><?php echo $pin->user_likes;?></span> <?php echo $this->_('View all Likes');?></a></li>
+									<li><a href="<?php echo $this->url(array('user_id' => $pin->user_id,'controller'=>'followers','query'=>$pin->username),'user_c');?>"><span class="num event-followers"><?php echo $pin->followers;?></span> <?php echo $this->_('View all Followers');?></a></li>
+								</ul>
+								<?php if($self_data->id != $pin->user_id) { ?>
+								<?php if($pin->user_is_follow) { ?>
+								<p class="follow"><a data-userid="<?php echo $pin->user_id;?>" href="<?php echo $this->url(array('user_id' => $pin->user_id,'controller'=>'follow','query'=>$pin->username),'user_c');?>" class="event-follow-user button button-color-2 button-size-small" data-textactive="<?php echo $this->_('Unfollow');?>" data-textinactive="<?php echo $this->_('Follow');?>"><?php echo $this->_('Unfollow');?></a></p>
+								<?php } else if($self_data->id) { ?>
+								<p class="follow"><a data-userid="<?php echo $pin->user_id;?>" href="<?php echo $this->url(array('user_id' => $pin->user_id,'controller'=>'follow','query'=>$pin->username),'user_c');?>" class="event-follow-user button button-color-1 button-size-small" data-textactive="<?php echo $this->_('Unfollow');?>" data-textinactive="<?php echo $this->_('Follow');?>"><?php echo $this->_('Follow');?></a></p>
+								<?php } else { ?>
+								<p class="follow"><a href="<?php echo $this->url(array('controller' => 'login', 'query' => '?next=' . urlencode($this->url(array('user_id' => $pin->user_id,'query'=>$pin->username),'user'))),'user_c',false,false);?>" class="button button-color-1 button-size-small"><?php echo $this->_('Follow');?></a></p>
+								<?php } ?>
+								<?php } ?>
+							</div>
+						</nav>
+						<div class="overflowhidden">
+							<?php /* ?>
+							<div class="description">
+								<div class="padwrapper">
+									<div class="scroll">
+										<span class="txt">
+											<?php echo \Pin\Helper\Description::tag($pin->description, $pin_tags); ?>
+										</span>
+										<?php if($pin_tags) { ?>
+										<span class="tags">
+											<?php foreach($pin_tags AS $tag) { ?>
+											<a href="<?php echo $this->url(array('query'=>$tag),'search');?>">#<?php echo $tag;?></a> 
+											<?php } ?>
+										</span> 
+										<?php } ?>
+									</div>
+								</div>
+							</div>
+							<?php */ ?>
+							<div class="data">
+								<div class="options clearfix">
+									<div class="member"><a href="<?php echo $this->url(array('user_id' => $pin->user_id,'query'=>$pin->username),'user');?>" class="avatar"><img data-original="<?php echo \User\Helper\Avatar::getImage('small', $pin)->image;?>" src="assets/images/grey.gif" width="48" height="48" alt="<?php echo $pin->getUserFullname();?>"></a></div>
+									<ul class="icons clearfix">
+										<?php if($self_data->id) { ?>
+										<li><a href="<?php echo $this->url(array('controller'=>'repin', 'pin_id'=>$pin->id),'pin_c');?>" class="event-fancybox-ajax icon-repin"><?php echo $this->_('PinIt');?></a></li>
+										<li><a href="<?php echo $this->url(array('controller'=>'like', 'pin_id'=>$pin->id),'pin_c');?>" class="event-like-click icon-like <?php if($pin->liked) { ?>active<?php } ?>" data-textactive="<?php echo $this->_('Unlike');?>" data-textinactive="<?php echo $this->_('Like');?>"><?php echo $pin->liked ? $this->_('Unlike') : $this->_('Like');?></a></li>
+										<?php } else { ?>
+										<li><a href="<?php echo $this->url(array('controller' => 'login', 'query' => '?next=' . urlencode($this->url(array('pin_id'=>$pin->id),'pin'))),'user_c',false,false);?>" class="icon-repin"><?php echo $this->_('PinIt');?></a></li>
+										<li><a href="<?php echo $this->url(array('controller' => 'login', 'query' => '?next=' . urlencode($this->url(array('pin_id'=>$pin->id),'pin'))),'user_c',false,false);?>" class="icon-like"><?php echo $this->_('Like');?></a></li>
+										<?php } ?>
+									</ul>
+									<?php if($pin->price) { ?>
+									<p class="price"><?php echo $pin->getPrice();?></p>
+									<?php } ?>
+								</div>
+							</div>
+							<p class="thumb" style="background-color: <?php echo $pin->background_color;?>">
+								<a class="event-popup-ajax event-history event-width-100" rel="pins" href="<?php echo $this->url(array('pin_id'=>$pin->id),'pin');?>">
+									<?php
+	// 								$image = $pin->getImage('medium');
+									$image = \Pin\Helper\Image::getImage('medium', $pin);
+									?>
+									<img class="event-load-lazy-load" style="width:<?php echo $image->width;?>px;height:<?php echo $image->height;?>px;" data-original="<?php echo $image->image;?>" src="assets/images/grey.gif" alt="<?php echo $pin->description;?>">
+								</a>
+							</p>
+							<p class="stats event-stats-<?php echo $pin->id;?>">
+								<span class="cell"><strong class="num event-repins"><?php echo $pin->repins;?></strong> <?php echo $this->_('repins');?></span>
+								<span class="cell"><strong class="num event-likes"><?php echo $pin->likes;?></strong> <?php echo $this->_('likes');?></span>
+								<span class="cell"><strong class="num event-comments"><?php echo $pin->comments;?></strong> <?php echo $this->_('comments');?></span>
+							</p>
+						</div>
+					</div>
+				</article>
+		
+			<?php } ?>
+			</div>
+		</div>
+	</section>
+	
+	<?php if($limit == $total_pins) { ?>
+	<div class="no-results">
+		<div class="container">
+			<p><a class="widget-paginator" href="<?php echo $this->getRequest()->getBaseUrl();?>?widget=pin.widget.grid&<?php echo $query;?>"><?php echo $this->_('Next page');?></a></p>	
+		</div>
+	</div>
+	<?php } else { ?>
+	<div class="no-results">
+		<div class="container">
+			<span class="widget-paginator"><?php echo $this->_('No more pins!');?></span>	
+		</div>
+	</div>
+	<?php } ?>
+
+<?php } else { ?>
+
+<?php if($this->createNewPin && $this->options['fromRow'] === 0) { ?>
+<section id="content">
+	<div class="container fluid">
+		<div class="boxcontainer">
+			<article class="box empty">
+				<div class="box-body">
+					<div class="overflowhidden">
+						<p class="thumb event-tooltip" title="<?php echo $this->escape($this->_('Add a Pin'));?>"><a class="event-fancybox-ajax" href="<?php echo $this->url(array('controller'=>'create'),'pin_c');?>"><img class="event-load-lazy-load" style="width:236px;height:298px;" data-original="assets/images/empty-pin.png" src="assets/images/grey.gif" alt="Pin"></a></p>
+						<p class="stats">
+							<span class="cell"><strong class="num event-repins">0</strong> <?php echo $this->_('repins');?></span>
+							<span class="cell"><strong class="num event-likes">0</strong> <?php echo $this->_('likes');?></span>
+							<span class="cell"><strong class="num event-comments">0</strong> <?php echo $this->_('comments');?></span>
+						</p>
+					</div>
+				</div>
+			</article>
+		</div>
+	</div>
+</section>
+<?php } ?>
+
+<div class="no-results">
+	<div class="container">
+		<span class="widget-paginator"><?php echo $this->_('No pins found!');?></span>	
+	</div>
+</div>
+<?php } ?>

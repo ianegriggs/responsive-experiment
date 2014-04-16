@@ -1,0 +1,6 @@
+<?php 
+$title = ($page->meta_title?$page->meta_title:$page->title) . ' / ' . \Meta\Meta::getGlobal('title');
+?>
+<title><?php echo $title;?></title>
+<meta name="description" content="<?php echo $page->meta_description;?>">
+<meta name="keywords" content="<?php echo $page->meta_keywords;?>">

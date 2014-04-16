@@ -1,0 +1,14 @@
+<?php if($pages) { ?>
+<li <?php if($this->is_group) { ?>class="group"<?php } ?>>
+	<a href="javascript:void(0);" class="icon-gifts"><?php echo $this->_('Gifts');?></a>
+	<nav class="dropdown">
+		<div class="dropdown-wrapper arrow-left">
+			<ul>
+			<?php foreach($pages AS $page) { ?>
+				<li><a href="<?php echo $this->url(array('from'=>$page['href']),'gifts', false, false);?>"><?php echo $page['title'];?></a></li>
+			<?php } ?>
+			</ul>
+		</div>
+	</nav>
+</li>
+<?php } ?>

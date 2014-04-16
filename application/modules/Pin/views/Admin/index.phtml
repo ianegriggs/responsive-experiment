@@ -1,0 +1,105 @@
+<?php echo $this->getController('admin/layout/header_part'); ?>
+
+<?php 
+$self = $this;
+echo $this->widget('widget.grid.db', array(
+	'head' => array(
+		'title' => $this->_('Pins'),
+		'icon' => 'cms/admin/images/push_pin.png'
+	),
+	'atributes' => 'class="display"',
+	'dataProvider' => new \Pin\Pin(),
+	'checkbox' => true,
+	'columns' => array(
+		array(
+			'atributes' => 'class="left" style="width:50px;"',
+			'name' => 'id',
+			'label' => '#'
+		),
+		array(
+			'atributes' => 'class="left" style="width:140px;"',
+			'name' => 'category_id',
+			'virtual' => array('title' => 'Category\CategoryDescription'),
+// 			'value' => function($data) use($self) { return '<a href="'.$self->url(array('module'=>'category','query'=>'filter[id]='.$data->category_id),'admin_module',false,false).'">'.$data->title.'</a>'; },
+			'label' => $this->_('Category'),
+			'filter' => false
+		),
+		array(
+			'atributes' => 'class="left" style="width:140px;"',
+			'name' => 'user_id',
+			'value' => function($data) use($self) { return '<a href="'.$self->url(array('module'=>'user','query'=>'filter[id]='.$data->id),'admin_module',false,false).'">'.$data->username.'</a>'; },
+			'label' => $this->_('User')
+		),
+		array(
+			'atributes' => 'class="left" style="width:140px;"',
+			'name' => 'board_id',
+			'value' => function($data) use($self) { return '<a href="'.$self->url(array('module'=>'board','query'=>'filter[id]='.$data->id),'admin_module',false,false).'">'.$data->title.'</a>'; },
+			'label' => $this->_('Board')
+		),
+		array(
+			'atributes' => 'class="left" style="width:140px;"',
+			'name' => 'source_id',
+			'value' => function($data) use($self) { return isset($data->name) ? '<a href="'.$self->url(array('module'=>'source','query'=>'filter[id]='.$data->id),'admin_module',false,false).'">'.$data->name.'</a>' : ''; },
+			'label' => $this->_('Source')
+		),
+		array(
+			'atributes' => 'class="left" style="width:50px;"',
+			'name' => 'likes',
+			'label' => $this->_('Likes'),
+			'filter' => false
+		),
+		array(
+			'atributes' => 'class="left" style="width:50px;"',
+			'name' => 'repins',
+			'label' => $this->_('Repins'),
+			'filter' => false
+		),
+		array(
+			'atributes' => 'class="left"',
+			'name' => 'description',
+			'label' => $this->_('Description'),
+			'value' => function($data) { return (string)new Core\Utf8\SplitText($data->description, 30, '...'); }
+		)
+	),
+	'filter' => array(
+		'status' => 1		
+	),
+	//'checkbox' => false,
+	'add_new' => false,
+	'replaceDelete' => function($pins, $self) {
+		set_time_limit(0);
+		$pinTable = new \Pin\Pin();
+		$boardTable = new \Board\Board();
+		$pinGalleryTable = new \Pin\PinGallery();
+		$pinTable->getAdapter()->beginTransaction();
+		try {
+			foreach($pins AS $pin) {
+				/*if($pin->gallery) {
+					$gallery = $pinGalleryTable->fetchAll(array('pin_id = ?' => $pin->id));
+					if($gallery) {
+						foreach($gallery AS $g) {
+							\Core\Http\Thread::run(array('\\'.$g->store . '\Helper\Upload','delete','pingallery'),$g->image);
+							$g->delete();
+						}
+					}
+				}
+				\Core\Http\Thread::run(array('\\'.$pin->store . '\Helper\Upload','delete','pinthumbs'),$pin->image);
+				$pin->delete();*/
+				$pin->status = 3;
+				$pin->save();
+			}
+			$pinTable->getAdapter()->commit();
+			return true;
+		} catch (\Core\Exception $e) {
+			$pinTable->getAdapter()->rollBack();
+			return false;
+		}
+	},
+	'replaceEditLink' => function($data) use($self) {
+		return $self->url(array('controller'=>'edit', 'pin_id'=>$data->id),'pin_c');
+	}
+));
+
+?>
+
+<?php echo $this->getController('admin/layout/footer_part'); ?>

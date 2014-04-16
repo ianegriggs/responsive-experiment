@@ -1,0 +1,37 @@
+<?php
+$userInfo = \User\User::getUserData();
+?>
+<div class="popup">
+	<div class="head">
+		<h3 class="title-2 color-1"><?php echo $this->_('Add a Pin from');?></h3>
+	</div>
+	<div class="body add-pin">
+		<?php 
+			$menu = \Base\Menu::getMenu('AddMenu');	
+		if($menu) {
+		?>
+		<ul class="addpin">
+			<?php 
+				foreach($menu AS $widget) {
+					if(strpos($widget->widget, 'pin')!==false) {
+					if($widget->is_widget) {
+						$config = array();
+						if($widget->config) {
+							$config = unserialize($widget->config);
+						}
+						$config['instance'] = $widget;
+						$config['is_group'] = $widget->is_group;
+						echo $this->widget($widget->widget, $config);
+					} else { ?>
+						<li>
+							<a href="<?php echo $this->url((array)unserialize($widget->route), $widget->widget);?>" class="event-fancybox-ajax icon-big-<?php echo $widget->widget;?>"><?php echo $this->_($widget->title);?></a>
+						</li>
+				<?php }
+				}
+				}
+			?>
+		</ul>
+		<div class="clear"></div>
+		<?php } ?>
+	</div>
+</div>

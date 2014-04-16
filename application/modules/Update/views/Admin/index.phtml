@@ -1,0 +1,44 @@
+<?php echo $this->getController('admin/layout/header_part'); ?>
+
+
+<br class="mtop25">
+<div class="info_line top">
+	<h3 class="fleft title">
+		<img alt="" src="cms/admin/images/extensions.png"> <?php echo $this->_('SQL Updates');?>
+	</h3>
+
+	<div class="clear"></div>
+</div>
+
+
+
+<table cellspacing="0" cellpadding="0" class="display">
+	<thead>
+		<tr class="nodrop nodrag">
+			<th class="left"><?php echo $this->_('Update');?></th>
+			<th width="1"><?php echo $this->_('Install');?></th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach($modules AS $module) { ?>
+		<tr id="row_<?php echo $module['id'];?>" class="grid_rows">
+			<td class="left"><?php echo $module['title'];?></td>
+			<td align="center">
+				<div class="grid-actions">
+					<?php if(!$module['install']) { ?>
+					<a href="<?php echo $this->url(array('module'=>'update','controller'=>'admin', 'action'=>'install','query'=>'id='.$module['id']),'admin_module',false,false);?>">
+						<img title="<?php echo $this->_('Install');?>" alt="" class="tooltip" src="cms/admin/images/install.png">
+					</a>
+					<?php } ?>
+				</div>
+			</td>
+		</tr>
+		<?php } ?>
+	</tbody>
+</table>
+
+
+<div class="clear"></div>
+
+
+<?php echo $this->getController('admin/layout/footer_part'); ?>

@@ -1,0 +1,40 @@
+<?php 
+	$menu = \Base\Menu::getMenu('InviteMenu');	
+	if($menu) {
+		$route = $this->getRouter();	
+		$name = '';
+		foreach($menu AS $widget) {
+			if($route->getCurrentRouteName()==$widget->widget) {
+				$name = $this->_($widget->title);
+			}
+		}
+?>
+<section class="bgcolor-1" id="headbar">
+	<div class="container">
+		<div class="searchbar clearfix">
+			<h3 class="title-3"><?php echo sprintf($this->_('Find friends from %s'),$name);?></h3>
+			<nav class="searchcats clearfix">
+				<ul>
+					<?php 
+						foreach($menu AS $widget) {
+							if($widget->is_widget) { 
+								$config = array();
+								if($widget->config) {
+									$config = unserialize($widget->config);
+								}
+								$config['instance'] = $widget;
+								$config['is_group'] = $widget->is_group;
+								echo $this->widget($widget->widget, $config);
+							} else { ?>
+								<li>
+									<a <?php if($route->getCurrentRouteName()==$widget->widget) {?>class="active"<?php } ?> href="<?php echo $this->url(array('controller' => 'invite'), $widget->widget);?>"><?php echo $this->_($widget->title);?></a>
+								</li>
+						<?php }
+						}
+					?>
+				</ul>
+			</nav>
+		</div>	
+	</div>
+</section>
+<?php } ?>

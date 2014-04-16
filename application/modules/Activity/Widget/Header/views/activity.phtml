@@ -1,0 +1,38 @@
+<nav class="dropdown">
+	<div class="dropdown-wrapper arrow-up">
+		<div class="recent-activity">
+			<h3 class="title-13"><a href="<?php echo $this->url(array(),'settings');?>" class="fright color-2"><?php echo $this->_('edit');?></a><?php echo $this->_('Recent Activity');?></h3>
+			<div class="event-scroll-pane scroll-pane">
+				<ul>
+					<?php foreach($activity AS $row) { ?>
+					<li data-id="<?php echo $row->id;?>">
+						<?php $date = new \Date\Helper\Diff($row->date_added, time()); ?>
+						<p class="member"><a href="<?php echo $this->url(array('user_id'=>$row->from_user_id,'query'=>$row->username),'user');?>"><img data-original="<?php echo \User\Helper\Avatar::getImage('small', $row)->image;?>" src="assets/images/grey.gif" width="60" height="60" alt="Avatar"></a></p>
+						<p class="text">
+							<a href="<?php echo $this->url(array('user_id'=>$row->from_user_id,'query'=>$row->username),'user');?>"><strong><?php echo $row->getUserFullname();?></strong></a> 
+							<?php if($row->action == 'REPIN') { ?>
+							<?php echo $this->_('repin');?> <a href="<?php echo $this->url(array('pin_id'=>$row->pin_id),'pin');?>"><strong><?php echo $this->_('your pin');?></strong></a>
+							<?php } else if($row->action == 'FOLLOW') { ?>
+							<?php echo $this->_('follow you');?>
+							<?php } else if($row->action == 'ADDPIN') { ?>
+							<?php echo $this->_('added to');?> <a href="<?php echo $this->url(array('board_id'=>$row->board_id,'query'=>$this->urlQuery($row->board)),'board');?>"><strong><?php echo $row->board;?></strong></a>
+							<?php } else if($row->action == 'LIKEPIN') { ?>
+							<?php echo $this->_('liked');?> <a href="<?php echo $this->url(array('pin_id'=>$row->pin_id),'pin');?>"><strong><?php echo $this->_('your pin');?></strong></a>
+							<?php } else if($row->action == 'COMMENTPIN') { ?>
+							<?php echo $this->_('commented');?> <a href="<?php echo $this->url(array('pin_id'=>$row->pin_id),'pin');?>"><strong><?php echo $this->_('your pin');?></strong></a>
+							<?php } else if($row->action == 'MENTIONED') { ?>
+							<?php echo $this->_('mentioned you in a');?> <a href="<?php echo $this->url(array('pin_id'=>$row->pin_id),'pin');?>"><strong><?php echo $this->_('comment');?></strong></a>
+							<?php } else if($row->action == 'INVITEBOARD') { ?>
+							<?php echo $this->_('invited you to');?> <a href="<?php echo $this->url(array('board_id'=>$row->board_id,'query'=>$this->urlQuery($row->board)),'board');?>"><strong><?php echo $row->board;?></strong></a>
+							<?php } else if($row->action == 'INVITEBOARDALLOW') { ?>
+							<?php echo $this->_('accepted your invitation to');?> <a href="<?php echo $this->url(array('board_id'=>$row->board_id,'query'=>$this->urlQuery($row->board)),'board');?>"><strong><?php echo $row->board;?></strong></a>
+							<?php } ?>
+						</p>
+						<p class="meta-text"><?php echo sprintf($this->_('%d %s ago'), $date->getSingle()->value, $this->_($date->getSingle()->key));?></p>
+					</li>
+					<?php } ?>
+				</ul>
+			</div>
+		</div>
+	</div>
+</nav>

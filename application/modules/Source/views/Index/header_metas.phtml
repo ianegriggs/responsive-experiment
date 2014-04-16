@@ -1,0 +1,9 @@
+<?php 
+$title = ($this->meta_title?$this->meta_title:$this->name) . ' / ' . \Meta\Meta::getGlobal('title');
+?>
+<title><?php echo $title;?></title>
+<meta name="description" content="<?php echo $this->meta_description?$this->description:$this->description;?>">
+
+<?php if($this->image) { ?>
+<link rel="image_src" href="<?php echo $this->image;?>">
+<?php } ?>

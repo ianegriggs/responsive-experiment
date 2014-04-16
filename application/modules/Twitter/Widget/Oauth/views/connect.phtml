@@ -1,0 +1,31 @@
+<div class="row">
+	<div class="cell cell-first">
+		<label for="connect-twitter" class="caption"><?php echo $this->_('Login with Twitter');?></label>
+	</div>
+	<div class="cell">
+		<span class="checkbox-slider"><input id="connect-twitter" type="checkbox" class="event-connect-twitter" <?php if($user['isConnected']) { ?>checked="checked"<?php } ?> /><label for="connect-twitter"><span>&nbsp;</span></label></span>
+		<span class="helptext"><?php echo $this->_('Use your Twitter account to Login');?></span>
+	</div>
+</div>
+<?php if(\Base\Config::get('twitter_post_timeline') && $user['isConnected']) { ?>
+<div class="row">
+	<div class="cell cell-first">
+		<label for="timeline-twitter" class="caption">&nbsp;</label>
+	</div>
+	<div class="cell">
+		<span class="checkbox-slider"><input id="timeline-twitter" type="checkbox" class="event-timeline-twitter" <?php if($user['isTimeline']) { ?>checked="checked"<?php } ?> /><label for="timeline-twitter"><span>&nbsp;</span></label></span>
+		<span class="helptext"><?php echo sprintf($this->_('Add %s to Twitter'),\Meta\Meta::getGlobal('title'));?></span>
+	</div>
+</div>
+<?php } ?>
+<script type="text/javascript" src="assets/js/twitter.js"></script>
+<script type="text/javascript">
+$('.event-connect-twitter').change(function(){
+	Twitter.startTwitterConnect("<?php echo $this->url(array('controller'=>'forward', 'query' => '?redirect_tw=connect'),'twitter', false, false);?>");
+});
+<?php if(\Base\Config::get('twitter_post_timeline') && $user['isConnected']) { ?>
+$('.event-timeline-twitter').change(function(){
+	Twitter.startTwitterConnect("<?php echo $this->url(array('controller'=>'forward', 'query' => '?redirect_tw=timeline'),'twitter', false, false);?>");
+});
+<?php } ?>
+</script>

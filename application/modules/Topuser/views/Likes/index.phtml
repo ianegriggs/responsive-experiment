@@ -1,0 +1,15 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<?php echo $this->widget('topuser.widget.header'); ?>
+
+<?php 
+echo $this->widget('user.widget.grid', array(
+	'filter' => array(
+		'callback' => array('id' => '\Topuser\Topuser::userByLikes()')
+	),
+	'useIndex' => array('PRIMARY'),
+	'order1' => 'likes DESC'
+));
+?>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

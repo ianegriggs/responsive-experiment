@@ -1,0 +1,71 @@
+<?php $userInfo = \User\User::getUserData();?>
+<div class="popup">
+	<div class="head">
+		<h3 class="title-2 color-1"><?php echo $this->_('Create Pin');?></h3>
+	</div>
+	<div class="body">
+		<form action="<?php echo $this->url(array('controller'=>'create-pin'),'bookmarklet');?>" method="post" id="event-form-create-pin">
+			<div class="mainform pinform">
+				<div class="row">
+					<div class="cell cell-addpin clearfix">
+						
+						<div class="avatar" style="background-image: url('<?php echo $pin_media;?>');"></div>
+						<div class="data">
+							<select id="create-pin6" name="board_id" class="event-board-init">
+								<option value=""><?php echo $this->_('Choose Board');?></option>
+								<?php foreach($boards AS $board) { ?>
+								<option value="<?php echo $board->id;?>"><?php echo $board->title;?> <?php if($userInfo->id != $board->user_id) { echo $this->_('(Shared)');}?></option>
+								<?php } ?>
+							</select>
+							<textarea id="create-pin7" name="description" placeholder="<?php echo $this->_('Description');?>"><?php echo $pin_title;?></textarea>
+						</div>	
+					</div>
+					<?php if($this->errors) { ?>
+					<div class="notification error"><?php echo implode('<br />', $this->errors)?><a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>
+					<?php } ?>
+				</div>
+				<div class="submit tright">
+					<button type="submit" class="event-loader button button-color-1 button-size-small"><?php echo $this->_('Pin It');?></button><button class="event-window-close button button-color-2 button-size-small"><?php echo $this->_('Cancel');?></button>
+				</div>
+			</div>
+			<p class="hide">
+				<input type="hidden" name="X-form-cmd" value="<?php echo $this->x_form_cmd;?>" />
+				
+				<input type="hidden" name="media" value="<?php echo $pin_media;?>" />
+				<input type="hidden" name="url" value="<?php echo $pin_url;?>" />
+				<?php if($this->redirect) { ?>
+				<input type="hidden" name="redirect" value="<?php echo $this->redirect;?>" />
+				<?php } ?>
+			</p>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+var svg = new Image();
+svg.src = 'assets/images/loaders/spinning-loader.svg';
+$('#event-form-create-pin').submit(function(){
+	/*App.addLoader('#event-form-create-pin .event-loader');*/
+	$('.notification.error').remove();
+});
+App.selectBoxWithBoard({
+	url :'<?php echo $this->url(array(),'createboard_simple');?>',
+	create:'<?php echo $this->escape($this->_('Create'));?>',
+	close:'<?php echo $this->escape($this->_('Close'));?>',
+	placeholder:'<?php echo $this->escape($this->_('Create New Board'));?>',
+	chose_category:'<?php echo $this->escape($this->_('Choose a Category'));?>',
+	categories: <?php echo \Core\Encoders\Json::encode( \Category\Category::getCategoryTreeSelect() );?>
+});
+</script>
+<script type="text/javascript">
+	$('html').css({overflow:'hidden','height':'100%'});
+	$('body').removeClass('pad-1').css({overflow:'hidden','padding-bottom':0,'height':'100%'});
+	var plus = $('.popup .notification').outerHeight();
+	if(plus) {
+		window.resizeTo(600,422+plus+20);
+	} else {
+		window.resizeTo(600,422);
+	}
+	$('.event-window-close').click(function() {
+		window.close();
+	});
+</script>

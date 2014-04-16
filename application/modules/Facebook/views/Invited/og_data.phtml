@@ -1,0 +1,9 @@
+<?php if(\Base\Config::get('facebook_key')) { ?>
+<meta property="fb:app_id" content="<?php echo \Base\Config::get('facebook_key');?>"/>
+<meta property="og:site_name" content="<?php echo \Meta\Meta::getGlobal('title');?>"/>
+<meta property="og:url" content="<?php echo (isset($og_data['url'])?$og_data['url']:'');?>"/>
+<meta property="og:title" content="<?php echo (isset($og_data['name'])?$og_data['name']:'');?>"/>
+<meta property="og:description" content="<?php echo (isset($og_data['description'])?$og_data['description']:'');?>"/>
+<meta property="og:image" content="<?php echo (isset($og_data['picture'])?$og_data['picture']:'');?>"/>
+<meta property="og:type" content="website"/>
+<?php } ?>

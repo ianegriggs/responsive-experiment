@@ -1,0 +1,15 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<?php echo $this->widget('topuser.widget.header'); ?>
+
+<?php 
+echo $this->widget('user.widget.grid', array(
+	'filter' => array(
+		'repins' => '>0'
+	),
+	'useIndex' => array('PRIMARY','repins'),
+	'order' => 'repins DESC'
+));
+?>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

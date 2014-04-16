@@ -1,0 +1,30 @@
+<?php 
+$menu = \Base\Menu::getMenu('oAuth');
+if($menu) {
+?>
+<div class="container mobile bgcolor-1 padding-4 radius arrow-left">
+	<span class="sticky-icon-soc"></span>
+	<div class="registerform">
+		<div class="row">
+			<p class="center"><?php echo $this->_('Connect with');?></p>
+		</div>
+		<?php for($i = 0, $j = 0; $i < ceil(count($menu)/2); $i++ ) { ?>
+		<div class="row socrow clearfix <?php if(!isset($menu[$j+1])) { echo 'center'; }?>">
+			<?php for($r = 0; $r < 2; $r++, $j++ ) { ?>
+			<?php if(isset($menu[$j])) { $class = $r == 1 ? 'fright' : ''; if($r == 0 && isset($menu[$j+1])) { $class = 'fleft'; } echo $this->widget($menu[$j]->widget, array('class' => $class, 'method' => $this->method, 'redirect' => $this->redirect)); } ?>
+			<?php } ?>
+		</div>
+		<?php } ?>
+	</div>
+</div>
+
+<?php if($this->method == 'register') { ?>
+<div class="container mobile">
+	<div class="registerform">
+		<div class="row">
+			<p class="center"><?php echo $this->_('or, sign up with an email address.');?></p>
+		</div>
+	</div>	
+</div>
+<?php } ?>
+<?php } ?>

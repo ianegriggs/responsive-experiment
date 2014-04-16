@@ -1,0 +1,41 @@
+<?php 
+	$menu = \Base\Menu::getMenu('TopusersMenu');	
+	if($menu) {
+		$controller = $this->getRequest()->getController();	
+		$name = '';
+		foreach($menu AS $widget) {
+			if($controller==($widget->widget?$widget->widget:'index')) {
+				$name = $this->_($widget->title);
+			}
+		}
+
+?>
+<section class="bgcolor-1" id="headbar">
+	<div class="container">
+		<div class="searchbar clearfix">
+			<h3 class="title-3"><span class="color-2"><?php echo sprintf($this->_('Top %s users'), $name);?></span></h3>
+			<nav class="searchcats clearfix">
+				<ul>
+					<?php 
+						foreach($menu AS $widget) {
+							if($widget->is_widget) { 
+								$config = array();
+								if($widget->config) {
+									$config = unserialize($widget->config);
+								}
+								$config['instance'] = $widget;
+								$config['is_group'] = $widget->is_group;
+								echo $this->widget($widget->widget, $config);
+							} else { ?>
+								<li>
+									<a <?php if($controller==($widget->widget?$widget->widget:'index')) {?>class="active"<?php } ?> href="<?php echo $this->url(array('controller' =>$widget->widget), 'topuser');?>"><?php echo $this->_($widget->title);?></a>
+								</li>
+						<?php }
+						}
+					?>
+				</ul>
+			</nav>
+		</div>	
+	</div>
+</section>
+<?php } ?>

@@ -1,0 +1,58 @@
+<?php 
+	$rtl = \Core\Base\Action::getInstance()->getModule('Language')->isRtl();
+?>
+<!doctype html>
+<html xmlns:fb="https://www.facebook.com/2008/fbml" <?php if($rtl) { ?>dir="rtl"<?php } ?>>
+	
+	<head>
+
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+		<base href="<?php echo $this->getRequest()->getBaseUrl();?>">
+		
+		<link href="http://fonts.googleapis.com/css?family=Lato:400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css">
+		<link href="assets/css/main<?php echo $rtl?'-rtl':''; ?>.css" rel="stylesheet" type="text/css">
+		<link href="assets/css/fancybox<?php echo $rtl?'-rtl':''; ?>.css" rel="stylesheet" type="text/css">
+		<link href="assets/css/magnific-popup<?php echo $rtl?'-rtl':''; ?>.css" rel="stylesheet" type="text/css">
+		<link href="assets/css/jcarousel.ajax.css" rel="stylesheet" type="text/css">
+		
+		<script type="text/javascript" src="assets/js/jquery-1.7.2.min.js"></script>
+		<script type="text/javascript" src="assets/js/jquery-ui-1.10.3.custom.min.js"></script>
+		<script type="text/javascript" src="assets/js/jquery.selectbox-0.2.js"></script>
+		<script type="text/javascript" src="assets/js/Turbo.js"></script>
+		<script type="text/javascript" src="assets/js/jquery.HelpFnc.js"></script>
+		<script type="text/javascript" src="assets/js/jquery.placeholder.js"></script>
+		<script type="text/javascript" src="assets/js/jquery.fancybox.js"></script>
+		<script type="text/javascript" src="assets/js/jquery.mousewheel-3.0.6.pack.js"></script>
+		<script type="text/javascript" src="assets/js/jquery.history.js"></script>
+		<script type="text/javascript" src="assets/js/tipr.js"></script>
+		<script type="text/javascript" src="assets/js/head.min.js"></script>
+		<script type="text/javascript" src="assets/js/head.css.js"></script>
+		<script type="text/javascript" src="assets/js/Model.js"></script>
+		
+		<script src="assets/js/Magnific/jquery.magnific-popup.min.js"></script>
+		<script type="text/javascript" src="assets/js/main.js"></script>
+		
+		<?php echo $this->placeholder('style');?>
+		
+		<?php echo $this->placeholder('meta_tags');?>
+		
+		<?php echo $this->placeholder('system_tags');?>
+		
+		<?php echo $this->placeholder('script');?>
+		
+		<?php echo \Base\Config::get('google_analytics');?>
+		
+	</head>
+	
+	<body class="pad-1 <?php echo $this->bodyCssClass();?>">
+		<noscript>
+    		<div id="NoScript">
+		        <h1><?php echo ('You need to enable Javascript.');?></h1>
+		    </div>
+		</noscript>
+		
+		<?php echo $this->placeholder('content');?>
+		
+	</body>
+</html>

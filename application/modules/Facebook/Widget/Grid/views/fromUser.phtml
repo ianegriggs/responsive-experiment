@@ -1,0 +1,68 @@
+<?php if($users->count()) { ?>
+<div class="no-results">
+	<div class="container">
+		<p><?php echo sprintf($this->_('Facebook friends who already are registered in %s'), \Meta\Meta::getGlobal('title'));?></p>	
+	</div>
+</div>
+<?php $self_data = \User\User::getUserData(); ?>
+<section id="content-<?php echo $this->call;?>">
+	<div class="container fluid">
+		<div class="clearfix event-masonry-holder-<?php echo $this->call;?>">
+			<?php $total_users = $users->count();?>
+			<?php foreach($users AS $user) { ?>
+			
+			<article class="box event-masonry-<?php echo $this->call;?>">
+				<div class="whitebox">
+					<div class="user event-stats-user-<?php echo $user->id;?>">
+						<a href="<?php echo $this->url(array('user_id' => $user->id,'query'=>$user->username),'user');?>" class="avatar"><img class="event-load-lazy-load" data-original="<?php echo \User\Helper\Avatar::getImage('medium', $user)->image;?>" src="assets/images/grey.gif" width="200" height="200" alt="Avatar" /></a>
+						<h3 class="title-5"><?php echo $user->getUserFullname();?></h3>
+						<p class="meta-text"><?php echo sprintf($this->_('%s pins &nbsp; %s boards'),'<span class="num event-pins">'.$user->pins.'</span>','<span class="num event-boards">'.$user->boards.'</span>')?></p>
+						<?php if($self_data->id != $user->id) { ?>
+						<?php if($user->following_user) { ?>
+						<p><a data-userid="<?php echo $user->id;?>" href="<?php echo $this->url(array('user_id' => $user->id,'controller'=>'follow','query'=>$user->username),'user_c');?>" class="event-follow-user button button-color-2 button-size-small" data-textactive="<?php echo $this->_('Unfollow');?>" data-textinactive="<?php echo $this->_('Follow');?>"><?php echo $this->_('Unfollow');?></a></p>
+						<?php } else if($self_data->id) { ?>
+						<p><a data-userid="<?php echo $user->id;?>" href="<?php echo $this->url(array('user_id' => $user->id,'controller'=>'follow','query'=>$user->username),'user_c');?>" class="event-follow-user button button-color-1 button-size-small" data-textactive="<?php echo $this->_('Unfollow');?>" data-textinactive="<?php echo $this->_('Follow');?>"><?php echo $this->_('Follow');?></a></p>
+						<?php } else { ?>
+						<p><a href="<?php echo $this->url(array('controller' => 'login', 'query' => '?next=' . urlencode($this->url(array('user_id' => $user->id,'query'=>$user->username),'user'))),'user_c',false,false);?>" class="button button-color-1 button-size-small"><?php echo $this->_('Follow');?></a></p>
+						<?php } ?>
+						<?php } ?>
+						<p class="meta-text"><?php echo sprintf($this->_('%s Followers'),'<span class="num event-followers">'.$user->followers.'</span>');?></p>
+					</div>
+				</div>
+			</article>
+			<?php } ?>
+		</div>
+	</div>
+</section>
+
+
+
+
+<?php if(!$from_widget) {  ?>
+<?php ob_start();?>
+<script type="text/javascript" src="assets/js/masonry.pkgd.min.js"></script>
+<?php $this->placeholder('script',ob_get_clean());?>
+<script type="text/javascript">
+$(document).ready(function(){
+	$('.event-masonry-holder-<?php echo $this->call;?>').bind('append', function(){ 
+		$(this).find('img').LazyLoad();
+	});
+	$('.event-masonry-holder-<?php echo $this->call;?>').masonry({
+		itemSelector : '.event-masonry-<?php echo $this->call;?>',
+		isFitWidth: true,
+		transitionDuration: 0,
+		columnWidth: 236,
+		gutter: 14,
+		isOriginLeft: <?php echo $this->getModule('Language')->isRtl() ? 'false' : 'true';?>
+	})
+});
+</script>
+<?php } ?>
+
+<?php } else { ?>
+<div class="no-results">
+	<div class="container">
+		<p><?php echo $this->_('No users!');?></p>	
+	</div>
+</div>
+<?php } ?>

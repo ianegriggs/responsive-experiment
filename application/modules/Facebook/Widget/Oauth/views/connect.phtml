@@ -1,0 +1,31 @@
+<div class="row">
+	<div class="cell cell-first">
+		<label for="f-18" class="caption"><?php echo $this->_('Login with Facebook');?></label>
+	</div>
+	<div class="cell">
+		<span class="checkbox-slider"><input id="f-18" type="checkbox" class="event-connect" <?php if($user['isConnected']) { ?>checked="checked"<?php } ?> /><label for="f-18"><span>&nbsp;</span></label></span>
+		<span class="helptext"><?php echo $this->_('Use your Facebook account to Login');?></span>
+	</div>
+</div>
+<?php if(\Base\Config::get('facebook_post_timeline') && $user['isConnected']) { ?>
+<div class="row">
+	<div class="cell cell-first">
+		<label for="f-18a" class="caption">&nbsp;</label>
+	</div>
+	<div class="cell">
+		<span class="checkbox-slider"><input id="f-18a" type="checkbox" class="event-timeline" <?php if($user['isTimeline']) { ?>checked="checked"<?php } ?> /><label for="f-18a"><span>&nbsp;</span></label></span>
+		<span class="helptext"><?php echo sprintf($this->_('Add %s to Facebook Timeline'),\Meta\Meta::getGlobal('title'));?></span>
+	</div>
+</div>
+<?php } ?>
+<script type="text/javascript" src="assets/js/facebook.js"></script>
+<script type="text/javascript">
+$('.event-connect').change(function(){
+	Facebook.startFacebookConnect("<?php echo $this->url(array('controller'=>'connect'),'facebook_c');?>","email,user_likes,user_birthday,offline_access,read_friendlists", false, true, "<?php echo $this->url(array('controller'=>'connect'),'facebook_c');?>");
+});
+<?php if(\Base\Config::get('facebook_post_timeline') && $user['isConnected']) { ?>
+$('.event-timeline').change(function(){
+	Facebook.startFacebookConnect("<?php echo $this->url(array('controller'=>'timeline'),'facebook_c');?>","publish_actions", true, true, "<?php echo $this->url(array('controller'=>'timeline'),'facebook_c');?>");
+});
+<?php } ?>
+</script>

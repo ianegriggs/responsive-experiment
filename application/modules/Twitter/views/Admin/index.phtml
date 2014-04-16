@@ -1,0 +1,35 @@
+<?php echo $this->getController('admin/layout/header_part'); ?>
+
+<?php 
+$self = $this;
+echo $this->widget('widget.form.phparray', array(
+	'head' => array(
+		'title' => $this->_('Twitter Settings'),
+	),
+	'columns' => \Base\Config::getGroupForm('twitter', $this->_),
+	'onSave' => function($values, $widget) use($self) {
+		$menuTable = new \Base\Menu();
+		$menuTable->getAdapter()->beginTransaction();
+		try {
+			$menu = $menuTable->fetchRow(array('widget = ?'=> 'twitter.widget.oauth'));
+			if($menu) {
+				$menu->status = $values['twitter_status'];
+				$menu->save();
+			}
+			if(\Base\Config::updateGroup('twitter', $values)) {
+				$menuTable->getAdapter()->commit();
+				return true;
+			} else {
+				$widget->errors = \Base\Config::getErrors();
+			}
+		} catch (\Core\Exception $e) {
+			$widget->errors = $e->getMessage();
+		}
+		$menuTable->getAdapter()->rollBack();
+		return false;
+	}
+));
+
+?>
+
+<?php echo $this->getController('admin/layout/footer_part'); ?>

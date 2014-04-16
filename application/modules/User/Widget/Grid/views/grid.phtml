@@ -1,0 +1,122 @@
+<?php if($users->count()) { ?>
+<?php $self_data = \User\User::getUserData(); ?>
+<section id="content">
+	<div class="container fluid">
+		<div class="boxcontainer event-masonry-holder">
+			<?php $total_users = $users->count();?>
+			<?php foreach($users AS $user) { ?>
+			<?php 
+				$pins = $user->findDependentRowset('Pin\Pin', null, $user->select()->limit(6)->order('id DESC')->where('status = 1'));
+			?>
+			
+			<article class="box people event-masonry">
+				<div class="box-body">
+					<div class="pedata">
+						<div class="pedescription">
+							<div class="ellipsis"><?php echo $user->getUserFullname();?></div>
+						</div>
+						<div class="peoptions">
+							<div class="pemember"><a href="<?php echo $this->url(array('user_id'=>$user->id,'query'=>$user->username),'user');?>" class="avatar"><img data-original="<?php echo \User\Helper\Avatar::getImage('small', $user)->image;?>" src="assets/images/grey.gif" width="60" height="60" alt="Avatar"></a></div>
+							<ul class="peicons clearfix event-stats-user-<?php echo $user->id;?>">
+								<li><?php echo sprintf($this->_('%s  pins'),'<span class="num event-pins">'.$user->pins.'</span>');?></li>
+								<li><?php echo sprintf($this->_('%s  boards'),'<span class="num event-boards">'.$user->boards.'</span>');?></li>
+							</ul>
+						</div>
+					</div>
+					<div class="profiles clearfix">
+						<ul>
+							<?php for($i=0; $i<6; $i++) { ?>
+							<?php 
+							if($pins->offsetExists($i)) {
+								$image = \Pin\Helper\Image::getImage('small', $pins[$i]);
+							} else {
+								$image = \Pin\Helper\Image::noImage('small');
+							} ?>
+							<li><a href="<?php echo $this->url(array('user_id'=>$user->id,'query'=>$user->username),'user');?>"><img src="assets/images/grey.gif" data-original="<?php echo $image->image;?>" width="78" height="78" alt="<?php echo $user->getUserFullname();?>"></a></li>
+							<?php } ?>
+						</ul>
+					</div>
+					<div class="followbar event-stats-user-<?php echo $user->id;?>">
+						<?php if($self_data->id != $user->id) { ?>
+						<?php if($user->following_user) { ?>
+						<p><a data-userid="<?php echo $user->id;?>" href="<?php echo $this->url(array('user_id' => $user->id,'controller'=>'follow','query'=>$user->username),'user_c');?>" class="event-follow-user button button-color-2 button-size-small" data-textactive="<?php echo $this->_('Unfollow');?>" data-textinactive="<?php echo $this->_('Follow');?>"><?php echo $this->_('Unfollow');?></a></p>
+						<?php } else if($self_data->id) { ?>
+						<p><a data-userid="<?php echo $user->id;?>" href="<?php echo $this->url(array('user_id' => $user->id,'controller'=>'follow','query'=>$user->username),'user_c');?>" class="event-follow-user button button-color-1 button-size-small" data-textactive="<?php echo $this->_('Unfollow');?>" data-textinactive="<?php echo $this->_('Follow');?>"><?php echo $this->_('Follow');?></a></p>
+						<?php } else { ?>
+						<p><a href="<?php echo $this->url(array('controller' => 'login', 'query' => '?next=' . urlencode($this->url(array('user_id' => $user->id,'query'=>$user->username),'user'))),'user_c',false,false);?>" class="button button-color-1 button-size-small"><?php echo $this->_('Follow');?></a></p>
+						<?php } ?>
+						<?php } ?>
+						<p class="meta-text"><?php echo sprintf($this->_('%s Followers'),'<span class="num event-followers">'.$user->followers.'</span>');?></p>
+					</div>
+				</div>
+			</article>
+			
+			<?php } ?>
+		</div>
+	</div>
+</section>
+
+<?php if($limit == $total_users) { ?>
+<div class="no-results">
+	<div class="container">
+		<p><a class="widget-paginator" href="<?php echo $this->getRequest()->getBaseUrl();?>?widget=user.widget.grid&<?php echo $query;?>""><?php echo $this->_('Next page');?></a></p>	
+	</div>
+</div>
+<?php } else { ?>
+<div class="no-results">
+	<div class="container">
+		<p><?php echo $this->_('No more users!');?></p>	
+	</div>
+</div>
+<?php } ?>
+<?php if(!$from_widget) {  ?>
+<script type="text/javascript" src="assets/js/jquery.infinitescroll.min.js"></script>
+<script type="text/javascript" src="assets/js/masonry.pkgd.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	$('.event-masonry-holder').bind('append', function(){ 
+		$(this).find('img').LazyLoad();
+	});
+	$('.event-masonry-holder').masonry({
+		itemSelector : '.event-masonry',
+		isFitWidth: true,
+		transitionDuration: 0,
+		columnWidth: 236,
+		gutter: 14,
+		isOriginLeft: <?php echo $this->getModule('Language')->isRtl() ? 'false' : 'true';?>
+	}).infscroll({
+		url: function(){ return $('.widget-paginator').attr('href'); },
+		offset: 200,//Math.ceil(Math.max($(window).height()*2,($(document).height()/2))),
+		loadingAppendTo: $('.event-masonry-holder'),
+		onSuccess: function(response){
+			var section = $(response);
+			var elements = section.find('.event-masonry');
+			var paginator = section.find('.widget-paginator');
+			if(paginator.size()) {
+				$('.widget-paginator').replaceWith(paginator);
+			} else {
+				$('.widget-paginator').remove();
+			}
+			if(!paginator.attr('href')) {
+				paginator.parents('section').removeClass('hide');
+			}
+			if(elements.size()) {
+				$('.event-masonry-holder').append(elements).masonry( 'appended', elements ).callbackAfter(function(){
+					elements.find('img').LazyLoad();
+				});
+			} else {
+				$('.event-masonry-holder').infscroll('destroy');
+			}
+		}
+	});
+});
+</script>
+<?php } ?>
+
+<?php } else { ?>
+<div class="no-results">
+	<div class="container">
+		<p><?php echo $this->_('No users!');?></p>	
+	</div>
+</div>
+<?php } ?>

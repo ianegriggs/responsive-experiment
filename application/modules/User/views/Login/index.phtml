@@ -1,0 +1,68 @@
+<?php $popup = $this->getRequest()->getQuery('popup') == 'true';?>
+<?php if(!$popup) { ?>
+<?php echo $this->getController('home/layout/header_part_short'); ?>
+<?php } ?>
+<section id="content"<?php if($popup) { ?> class="js-popup"<?php } ?>>
+	
+	<?php echo $this->widget('user.widget.social', array('method' => 'login', 'redirect' => $this->redirect));?>
+	
+	<div class="container mobile bgcolor-1 padding-4 radius arrow-left">
+		<span class="sticky-icon-logreg"></span>
+		<div class="registerform">
+			<form action="<?php echo $this->url(array('controller' => 'login', 'query' => ($popup?'?popup=true':'')),'user_c', false, false);?>" method="post">
+				<?php if($this->errors) { ?>
+				<div class="notification error no-mtop">
+					<?php echo implode('<br />', $this->errors);?>
+					<a class="button-close" href="javascript:;"><?php echo $this->_('Close')?></a>
+				</div>
+				<?php } ?>
+				<?php if($this->redirect && !$this->getRequest()->isPost()) { ?>
+				<div class="notification error">
+					<?php echo $this->_('To perform this action, please log in!');?>
+					<a class="button-close" href="javascript:;"><?php echo $this->_('Close')?></a>
+				</div>
+				<?php } ?>
+				<div class="row">
+					<input type="text" name="email" value="<?php echo $this->getRequest()->getPost('email')?>" placeholder="<?php echo $this->escape($this->_('E-mail'));?>" class="icon-input-user<?php if(isset($this->errors['email'])) { echo ' error-field'; }?>" />
+				</div>
+				<div class="row">
+					<input type="password" name="password" value="<?php echo $this->getRequest()->getPost('password')?>" placeholder="<?php echo $this->escape($this->_('Password'));?>" class="icon-input-password<?php if(isset($this->errors['password'])) { echo ' error-field'; }?>" />
+				</div>
+				<div class="row">
+					<button class="button button-color-1 button-size-large"><?php echo $this->_('Login');?></button>
+				</div>
+				<?php if(!$popup) { ?>
+				<div class="row">
+					<p class="center"><a href="<?php echo $this->url(array('controller'=>'forgotten'),'user_c');?>" class="color-8 underline"><?php echo $this->_('Lost Password?');?></a></p>
+				</div>
+				<?php } ?>
+				<p class="hide">
+					<input type="hidden" name="X-form-cmd" value="<?php echo $this->x_form_cmd;?>" />
+					<?php if($this->redirect) { ?>
+					<input type="hidden" name="redirect" value="<?php echo $this->redirect;?>" />
+					<?php } ?>
+				</p>
+			</form>
+		</div>
+	</div>
+
+	<?php if(!$popup) { ?>
+	<div class="container mobile">
+		<div class="registerform">
+			<div class="row">
+				<p class="center"><?php echo sprintf($this->_('or, sign up with %s.'),'<a href="' . $this->url(array('controller' => 'register'),'user_c') . '" class="color-4">' . $this->_('your email address') . '</a>');?></p>
+			</div>
+			<div class="row">
+				<p class="center"><a href="<?php echo $this->url(array('controller' => 'register'),'user_c');?>" class="button button-color-2 button-size-small"><?php echo sprintf($this->_('Join %s'),\Meta\Meta::getGlobal('title'));?></a></p>
+			</div>
+		</div>	
+	</div>
+	<?php } ?>
+
+</section>
+<?php if($popup) { ?>
+<script type="text/javascript">
+	$('body').removeClass('pad-1').css({overflow:'hidden','padding-bottom':0});
+	window.resizeTo(585,500);
+</script>
+<?php } ?>

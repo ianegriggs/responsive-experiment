@@ -1,0 +1,36 @@
+<?php $query_search = $this->escape($this->getRequest()->getRequest('query')); ?>
+<section class="bgcolor-1" id="headbar">
+	<div class="container">
+		<div class="searchbar clearfix">
+			<h3 class="title-3"><span class="color-2"><?php echo $this->_('Search results for:');?></span> <?php echo $query_search;?></h3>
+			<?php 
+				$menu = \Base\Menu::getMenu('SearchMenu');	
+				if($menu) {
+					$route = $this->getRouter();	
+
+			?>
+			<nav class="searchcats clearfix">
+				<ul>
+					<?php 
+						foreach($menu AS $widget) {
+							if($widget->is_widget) { 
+								$config = array();
+								if($widget->config) {
+									$config = unserialize($widget->config);
+								}
+								$config['instance'] = $widget;
+								$config['is_group'] = $widget->is_group;
+								echo $this->widget($widget->widget, $config);
+							} else { ?>
+								<li>
+									<a <?php if($route->getCurrentRouteName()==$widget->widget) {?>class="active"<?php } ?> href="<?php echo $this->url(array('query' =>$query_search), $widget->widget);?>"><?php echo $this->_($widget->title);?></a>
+								</li>
+						<?php }
+						}
+					?>
+				</ul>
+			</nav>
+			<?php } ?>
+		</div>	
+	</div>
+</section>

@@ -1,0 +1,50 @@
+<?php if($pins && $pins->count()) { ?>
+<div class="whitebox">
+	<p class="meta-text-2 no-strong"><?php echo $this->_('Other pins from');?></p>
+	<h3 class="title-5"><a href="<?php echo $this->url(array('user_id'=>$user->id, 'query'=>$user->username),'user');?>"><?php echo $user->getUserFullname();?></a></h3>
+	<div class="gallery">
+		<a href="javascript:;" class="button button-gallery button-gallery-prev event-gallery-prev-from-user<?php echo $user->id;?>">&nbsp;</a>
+		<ul class="clearfix event-user<?php echo $user->id;?>-pins">
+			<?php foreach($pins AS $pin) { ?>
+			<li><a class="event-turbo-click event-history event-width-100 event-no-loader" href="<?php echo $this->url(array('pin_id'=>$pin->id),'pin');?>"<?php if($popup) { ?> data-popup="true"<?php } ?>><img class="event-load-lazy-load" width="78" height="78" alt="Thumb" src="assets/images/grey.gif" data-original="<?php echo \Pin\Helper\Image::getImage('small', $pin)->image;?>" onload="$(this).LazyLoad();" /></a></li>
+			<?php } ?>
+		</ul>
+		<a href="javascript:;" class="button button-gallery button-gallery-next event-gallery-next-from-user<?php echo $user->id;?>">&nbsp;</a>
+	</div>
+</div>
+<script type="text/javascript">
+var cachedDataUser<?php echo $user->id;?> = {'1' : $('.event-user<?php echo $user->id;?>-pins').get(0).outerHtml}, page=1;
+$('.event-gallery-prev-from-user<?php echo $user->id;?>').click(function() {
+	var self = this;
+	App.addLoaderFull(self);
+	page--;
+	if(page < 1) {
+		page = 1;
+	}
+	if(cachedDataUser<?php echo $user->id;?>[page]) {
+		$('.event-user<?php echo $user->id;?>-pins').replaceWith(cachedDataUser<?php echo $user->id;?>[page]);
+	}
+	App.removeLoader(self);
+});
+$('.event-gallery-next-from-user<?php echo $user->id;?>').click(function() {
+	var self = this;
+	App.addLoaderFull(self);
+	page++;
+	if(cachedDataUser<?php echo $user->id;?>[page]) {
+		App.removeLoader(self);
+		$('.event-user<?php echo $user->id;?>-pins').replaceWith(cachedDataUser<?php echo $user->id;?>[page]);
+	} else {
+		App._ajax({
+			'url' : '?widget=user.widget.otherpins&user_id=<?php echo $user->id;?>&page='+ page + '&limit=<?php echo $this->limit;?><?php if($popup) { ?>&popup=true<?php } ?>',
+			'onSuccess': function(data) {
+				if(data) {
+					cachedDataUser<?php echo $user->id;?>[page] = data;
+					$('.event-user<?php echo $user->id;?>-pins').replaceWith(data);
+				}
+				App.removeLoader(self);
+			}
+		});
+	}
+});
+</script>
+<?php } ?>

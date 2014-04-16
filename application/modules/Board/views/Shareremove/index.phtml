@@ -1,0 +1,36 @@
+<div class="popup">
+	<div class="head">
+		<h3 class="title-2 color-1"><?php echo $this->_('Remove your account from this board');?></h3>
+	</div>
+	<div class="body">
+		<?php if($board->self_shared_board) { ?>
+		<?php echo $this->_('Do you really want to remove your profile from this board?');?>
+		
+		<div class="mainform pinform">
+			<div class="submit tright">
+				<button class="event-remove-board button button-color-1 button-size-small"><?php echo $this->_('Remove');?></button><button class="event-fancybox-close button button-color-2 button-size-small"><?php echo $this->_('Cancel');?></button>
+			</div>
+		</div>
+		<?php } else { ?>
+		<div class="notification error"><?php echo $this->_('This board is not shared with you');?></div>
+		<?php } ?>
+	</div>
+</div>
+<?php if($board->self_shared_board) { ?>
+<script type="text/javascript">
+$('.event-remove-board').click(function(){
+	App._ajax({
+		url: '<?php echo $this->url(array('controller'=>'share-remove','board_id'=>$board->id),'board_c');?>',
+		type:'POST',
+		onSuccess: function(json) {
+			if(json.error) {
+				$('.popup .mainform:first').prepend('<div class="notification error">' + json.error + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+			} else if(json.ok) {
+				$('.event-stats-board-<?php echo $board->id;?>').parents('.board').remove();
+				$('.event-fancybox-close').click();
+			}
+		}
+	});
+});
+</script>
+<?php } ?>

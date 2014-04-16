@@ -1,0 +1,75 @@
+<?php echo $this->getController('admin/layout/header_part'); ?>
+
+<br class="mtop25">
+
+<?php if(isset($success) || isset($error)) { ?>
+<?php if(isset($success)) { ?>
+<span id="<?php echo $this->id;?>-fader" class="fader-message"><span class="msgOk"><span><?php echo $this->_('Success!');?></span><?php echo $success;?></span></span>
+<?php } else if(isset($error)) { ?>
+<span id="<?php echo $this->id;?>-fader" class="fader-message"><span class="msgError"><span><?php echo $this->_('Error!');?></span><?php echo $error;?></span></span>
+<?php } ?>
+<script type="text/javascript"> 
+// <![CDATA[
+$(document).ready(function() {       
+	setTimeout(function() {
+		$("#<?php echo $this->id;?>-fader").customFadeOut("slow" ,    
+		function() {       
+			$("#<?php echo $this->id;?>-fader").remove();  
+		});
+	},
+	10000);
+});
+// ]]>
+</script>
+<?php } ?>
+
+<div class="info_line top">
+	<h3 class="fleft title">
+		<img alt="" src="cms/admin/images/extensions.png"> <?php echo $this->_('Install module');?>
+	</h3>
+
+	<div class="clear"></div>
+</div>
+
+
+
+<table cellspacing="0" cellpadding="0" class="display">
+	<thead>
+		<tr class="nodrop nodrag">
+			<th class="left"><?php echo $this->_('Module');?></th>
+			<th width="1"><?php echo $this->_('Install');?></th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach($modules AS $module) { ?>
+		<?php if($this->allow($module['module'])) { ?>
+		<tr id="row_<?php echo $module['id'];?>" class="grid_rows">
+			<td class="left"><?php echo $module['module'];?></td>
+			<td align="center">
+				<div class="grid-actions">
+					<?php 
+						$classname = $this->getFrontController()->formatModuleName('\\' . $module['module'] . '\install\module');
+						$file = str_replace('\\',DIRECTORY_SEPARATOR,$this->getFrontController()->classToFilename($classname));
+					?>
+					<?php if(!$module['install']) { ?>
+					<a href="<?php echo $this->url(array('module'=>'install','controller'=>'admin', 'action'=>'install','query'=>'id='.$module['id']),'admin_module',false,false);?>">
+						<img title="<?php echo $this->_('Install');?>" alt="" class="tooltip" src="cms/admin/images/install.png">
+					</a>
+					<?php } else if($module['module'] != 'base' && file_exists(APPLICATION_PATH . DIRECTORY_SEPARATOR . 'modules' . $file)) { ?>
+					<a href="<?php echo $this->url(array('module'=>'install','controller'=>'admin', 'action'=>'uninstall','query'=>'id='.$module['id']),'admin_module',false,false);?>">
+						<img title="<?php echo $this->_('Uninstall');?>" alt="" class="tooltip" src="cms/admin/images/uninstall.gif">
+					</a>
+					<?php } ?>
+				</div>
+			</td>
+		</tr>
+		<?php } ?>
+		<?php } ?>
+	</tbody>
+</table>
+
+
+<div class="clear"></div>
+
+
+<?php echo $this->getController('admin/layout/footer_part'); ?>

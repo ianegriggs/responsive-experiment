@@ -1,0 +1,81 @@
+<div class="popup">
+	<div class="head">
+		<h3 class="title-2 color-1"><?php echo $this->_('Gallery Pin');?></h3>
+	</div>
+	<div class="body">
+		<div class="uploadwindow"></div>
+		<div class="mainform">
+			<div class="submit tright no-mtop">
+				<button type="button" disabled="disabled" class="button button-color-2 button-size-small event-click-steptwo"><?php echo $this->_('Next');?></button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<?php $rtl = $this->getModule('Language')->isRtl();?>
+<script type="text/javascript">
+Turbo.head({
+	css : ['assets/plupload/style<?php echo $rtl?'-rtl':''; ?>.css'],
+	js	: [
+			'assets/plupload/plupload.full.min.js',
+			'assets/plupload/jquery.plupload.queue/jquery.plupload.queue.js'
+	  		],
+	callback: function() {
+
+		// Setup html5 version
+		var uploader = $(".uploadwindow").pluploadQueue({
+			// General settings
+			runtimes : 'html5,html4,flash,silverlight',
+			url : '<?php echo $this->url(array('controller'=>'upload'),'gallerypin_c');?>',
+			//chunk_size: '1mb',
+			rename : true,
+			dragdrop: true,
+			
+			filters : {
+				// Maximum file size
+				max_file_size : '10mb',
+				// Specify what files to browse for
+				mime_types: [
+					{title : "<?php echo $this->_('Image files');?>", extensions : "jpg,jpeg,gif,png"}
+				]
+			},
+
+			flash_swf_url : 'assets/plupload/Moxie.swf',
+			silverlight_xap_url : 'assets/plupload/Moxie.xap'
+		}).pluploadQueue();
+		$.fancybox.reposition();
+
+		uploader.bind('FileUploaded', function(up, file, res) {
+
+			try {
+				var json = jQuery.parseJSON(res.response);
+				if(json.error) {
+					uploader.trigger("Error", {
+	                    code: 100,
+	                    message: json.error,
+	                    file: file,
+	                    status: res.status
+	                });
+				} else if(json.location) {
+					window.location = json.location;
+					return;
+				}
+			} catch (e) { }
+			
+	        if(up.total.queued == 0) {
+	        	$('.event-click-steptwo').attr('disabled',false).addClass('button-color-1').removeClass('button-color-2');
+	        }
+	        
+	    });
+
+		$('.event-click-steptwo').click(function() {
+			if(!$(this).is(':disabled')) {
+				App.addLoader(this);
+				var link = $('<a>').attr('href', '<?php echo $this->url(array('controller'=>'create-pin'),'gallerypin_c');?>').addClass('event-fancybox-ajax');
+				link.appendTo('body').click().remove();
+			}
+		});
+		
+	}
+});
+</script>

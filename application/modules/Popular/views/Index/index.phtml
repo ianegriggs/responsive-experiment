@@ -1,0 +1,12 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<?php echo $this->widget('pin.widget.grid', array(
+	'filter' => array(
+		'likes' => '>0',
+		'comments' => '>0'
+	),
+	'useIndex' => array('PRIMARY', 'popular')
+));
+?>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

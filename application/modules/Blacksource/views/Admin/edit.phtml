@@ -1,0 +1,39 @@
+<?php echo $this->getController('admin/layout/header_part'); ?>
+
+<?php 
+$self = $this;
+echo $this->widget('widget.form.phparray', array(
+	'head' => array(
+		'title' => $this->_('Black Source')
+	),
+	'columns' => array(
+		array(
+			'name' => 'name',
+			'label' => $this->_('Source'),
+			'type' => 'Url',
+			'required' => true,
+			'value' => '',
+		),
+	),
+	'onSave' => function($values, $widget) use($self) {
+		$blackTable = new \Blacksource\Blacksource();
+		$new = $blackTable->fetchNew();
+		$new->name = mb_strtolower(preg_replace('/^www./i', '', \Core\Form\Validator::clearHost($values['name'])), 'utf-8');
+
+		try {
+			if($new->save()) {
+				return true;
+			} else {
+				$widget->errors = $self->_('Record not save');
+			}
+		} catch (\Core\Exception $e) {
+			$widget->errors = $e->getMessage();
+		}
+		
+		return false;
+	}
+));
+
+?>
+
+<?php echo $this->getController('admin/layout/footer_part'); ?>

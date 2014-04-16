@@ -1,0 +1,49 @@
+<li class="event-activity">
+	<a href="javascript:;" class="icon icon-activity notifcirclewrapper"><?php if($total) { ?><span class="notifcircle"><?php echo $total;?></span><?php } ?><?php echo $this->_('Activity');?></a>
+</li>
+<?php ob_start();?>
+<script type="text/javascript" src="assets/js/jquery.jscrollpane.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	var loaded = false, activity;
+	$('.event-activity a').click(function() {
+		if(!$('.event-activity .dropdown').size()) {
+			self = this;
+			$('.dropdown', this).remove();
+			App._ajax({
+				'url' : '?widget=activity.widget.header',
+				onSuccess: function(json) {
+					$('.notifcircle', self).remove();
+					activity = $('.event-activity').append(json).find('.event-scroll-pane').jScrollPane({
+						mouseWheelSpeed: 15,
+						horizontalGutter: 0
+					}).bind('mousewheel', function(e) {
+			            e.preventDefault();
+			        });
+					activity.bind('jsp-scroll-y',function(event, scrollPositionY, isAtTop, isAtBottom) {
+						if(!loaded && (($(this).find('.jspPane').height() - $(this).find('.jspContainer').height() )-125) < scrollPositionY) {
+							loaded = true;
+							App._ajax({
+								'url' : '?widget=activity.widget.header',
+								data: {max: $(this).find('li:last').data('id')},
+								onSuccess: function(json) {
+									var li = $(json).find('li');
+									if(li.size()) {
+										$('.event-activity ul').append(li);
+									}
+								}
+							});
+						}
+					});
+				}
+			});
+		}
+	});
+	$('.event-activity,.event-activity ul').bind('append', function(){
+		$(this).find('img, .event-load-lazy-load').LazyLoad();
+		activity ? activity.data('jsp').reinitialise() : false;
+		loaded = false;
+	});
+});
+</script>
+<?php $this->placeholder('script', ob_get_clean());?>

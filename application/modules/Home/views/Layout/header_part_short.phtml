@@ -1,0 +1,16 @@
+<header class="welcome margin-top-negative-60">
+	<div class="container mobile">
+		<div class="logobar">
+			<p><?php echo $this->_('Welcome to');?></p>
+			<p>
+				<a href="<?php echo $this->url(array(),'welcome_home');?>">
+					<?php if(\Base\Config::get('site_logo_big')) { ?>
+					<img src="uploads/data/<?php echo \Base\Config::get('site_logo_big');?>" alt="<?php echo \Meta\Meta::getGlobal('title');?>" />
+					<?php } else { ?>
+					<img src="assets/images/logo-large.png" width="253" height="72" alt="<?php echo \Meta\Meta::getGlobal('title');?>" />
+					<?php } ?>
+				</a>
+			</p>
+		</div>
+	</div>
+</header>

@@ -1,0 +1,201 @@
+<?php if($location) { $this->redirect($location); exit; } ?>
+<?php if(!$isXmlHttpRequest) {
+	echo $this->getController('home/layout/header_part');
+	echo '<section>';
+} 
+
+$userInfo = \User\User::getUserData();
+?>
+
+<div class="popup">
+	<div class="head">
+		<h3 class="title-2 color-1"><?php echo $this->_('Edit Board');?></h3>
+	</div>
+	<div class="body">
+		<form action="<?php echo $this->url(array('controller'=>'edit', 'board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board_c');?>" method="post" class="event-edit-board">
+			<?php if($this->errors) { ?>
+			<div class="notification error"><?php echo implode('<br />', $this->errors);?><a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>
+			<?php } ?>
+			<div class="mainform boardform">
+				<p class="hide">
+					<input type="hidden" name="X-form-cmd" value="<?php echo $this->x_form_cmd;?>" />
+				</p>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="edit-board1" class="caption"><?php echo $this->_('Board Name');?></label>
+					</div>
+					<div class="cell">
+						<input type="text" id="edit-board1" class="large" placeholder="<?php echo $this->_('Your Board Name');?>" name="title" value="<?php echo $board->title;?>" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="edit-board2" class="caption"><?php echo $this->_('Description');?></label>
+					</div>
+					<div class="cell">
+						<textarea id="edit-board2" class="large" placeholder="<?php echo $this->_('Board Description');?>" name="description"><?php echo $board->description;?></textarea>
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="edit-board3" class="caption"><?php echo $this->_('Category');?></label>
+					</div>
+					<div class="cell">
+						<select class="large" id="edit-board3" name="category_id">
+							<option value=""><?php echo $this->_('Choose a Category');?></option>
+							<?php foreach($categories AS $category) { ?>
+							<?php if($board->category_id == $category->id) { ?>
+							<option selected="selected" <?php if($category->disabled) { ?>disabled="disabled"<?php } ?> value="<?php echo $category->id;?>"><?php echo $category->title;?></option>
+							<?php } else { ?>
+							<option <?php if($category->disabled) { ?>disabled="disabled"<?php } ?> value="<?php echo $category->id;?>"><?php echo $category->title;?></option>
+							<?php } ?>
+							<?php } ?>
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="edit-board4" class="caption"><?php echo $this->_('Who can pin?');?></label>
+					</div>
+					<div class="cell">
+						<input type="text" id="edit-board4" class="large invite-field event-auto-complete-friends-edit" placeholder="<?php echo $this->_('Type a name or email');?>">
+						<ul class="memberslist event-auto-complete-friends-append-edit">
+							<li class="clearfix">
+								<p class="avatar"><img class="event-load-lazy-load" data-original="<?php echo \User\Helper\Avatar::getImage('small', $user)->image;?>" src="assets/images/grey.gif" width="58" height="58" alt="Avatar"></p>
+								<h3 class="title-4"><?php echo $user->getUserFullname();?></h3>
+								<?php if($user->id == $userInfo->id) { ?>
+								<p class="helptext"><?php echo $this->_('You created this board');?></p>
+								<?php } else { ?>
+								<p class="helptext"><?php echo $this->_('created this board');?></p>
+								<?php } ?>
+							</li>
+							<?php if($users) { ?>
+							<?php foreach($users AS $invite) { ?>
+							<li class="clearfix event-user-board-<?php echo $invite->id;?>">
+								<a href="javascript:" class="button button-color-2 button-size-small event-remove-row"><?php echo $this->_('Remove');?></a>
+								<p class="avatar"><img class="event-load-lazy-load" data-original="<?php echo \User\Helper\Avatar::getImage('small', $invite)->image;?>" src="assets/images/grey.gif" width="58" height="58" alt="Avatar"></p>
+								<h3 class="title-4"><?php echo $invite->getUserFullname();?></h3>
+								<?php if($user->id == $userInfo->id) { ?>
+								<p class="helptext"><?php echo $this->_('invited by you');?></p>
+								<?php } else { ?>
+								<p class="helptext"><?php echo sprintf($this->_('invited by %s'),$user->getUserFullname());?></p>
+								<?php } ?>
+								<input type="hidden" name="invite[]" value="<?php echo $invite->id;?>" />
+							</li>
+							<?php } ?>
+							<?php } ?>
+						</ul>
+					</div>
+				</div>
+				<?php /* ?>
+				<div class="row group">
+					<div class="cell cell-first">
+						<label for="edit-board5" class="caption"><?php echo $this->_('Email');?></label>
+					</div>
+					<div class="cell">
+						<span class="checkbox-slider"><input id="edit-board5" type="checkbox" name="email_me" <?php if($board->email_me) { ?>checked="checked"<?php }?> /><label for="edit-board5"><span>&nbsp;</span></label></span>
+						<span class="helptext"><?php echo $this->_('Get an email when someone pins to this board');?></span>
+					</div>
+				</div>
+				<?php */ ?>
+				<div class="row group">
+					<div class="cell cell-first">
+						<label for="create-board5" class="caption"><?php echo $this->_('Secret');?></label>
+					</div>
+					<div class="cell">
+						<span class="checkbox-slider"><input id="create-board5" type="checkbox" name="secret" value="1" <?php if($board->secret) {?>checked="checked"<?php }?>><label for="create-board5"><span>&nbsp;</span></label></span>
+						<span class="helptext"><?php echo $this->_('Make this board secret');?></span>
+					</div>
+				</div>
+				<div class="submit clearfix">
+					<a class="event-fancybox-ajax fright disabled-text" href="<?php echo $this->url(array('controller'=>'delete', 'board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board_c');?>"><strong><?php echo $this->_('Delete Board');?></strong></a>
+					<button type="submit" class="event-loader-edit button button-color-1 button-size-small"><?php echo $this->_('Save Board');?></button><button type="button" class="event-fancybox-close button button-color-2 button-size-small"><?php echo $this->_('Cancel');?></button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div> 
+
+<script type="text/template" id="event-autocomplete-template">
+<li class="clearfix event-user-board-${id}">
+	<a href="javascript:" class="button button-color-2 button-size-small hide event-remove-row"><?php echo $this->_('Remove');?></a>
+	<p class="avatar"><img class="event-load-lazy-load" data-original="${avatar}" src="assets/images/grey.gif" width="58" height="58" alt="Avatar"></p>
+	<h3 class="title-4">${name}</h3>
+	<p class="helptext hide"><?php echo $this->_('invited by you');?></p>
+	<input type="hidden" name="invite[]" value="${id}" />
+</li>
+</script>
+
+<script type="text/javascript">
+$('.event-edit-board').submit(function(){
+	App.addLoader('.event-loader-edit');
+	$('.notification.error').remove();
+	App._ajax({
+		url: '<?php echo $this->url(array('controller'=>'edit', 'board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board_c');?>',
+		data: $(this).serialize(),
+		type: 'POST',
+		onSuccess: function(json) {
+			App.removeLoader('.event-loader-edit');
+			if(json.location) {
+				window.location = json.location;
+			} else if(json.errors) {
+				var error = '';
+				for( i in json.errors ) {
+					error += json.errors[i] + '<br />';
+				}
+				$('.event-edit-board').prepend('<div class="notification error">' + error + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+			} else {
+				console.log(json);
+			}
+		}
+	});
+	return false;
+});
+$('.event-load-lazy-load').LazyLoad();
+$('.event-remove-row').live('click', function() {
+	$(this).parents('.clearfix').remove();
+	return false;
+});
+Turbo.head({
+	js: ['assets/js/jquery.autoComplete.js'],
+	callback: function() {
+		$('.event-auto-complete-friends-edit').autoComplete({
+			ajax: '<?php echo $this->url(array('controller' => 'friends'),'user_c');?>',
+			maxHeight: 331,
+			backwardsCompatible: true,
+			onListFormat: function(event, data) { 
+				data.ul.empty().addClass('memberslist').bind('append', function(){
+					data.ul.find('.event-load-lazy-load').LazyLoad();
+				});
+				if(data.list) {
+					function escapeRegExp(str) {
+						return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+					}
+					$(data.list).each(function(i, item) {
+						var template = $('#event-autocomplete-template').html();
+						user = template.replace(new RegExp(escapeRegExp('${id}'),'g'), item.id)
+										.replace(new RegExp(escapeRegExp('${name}'),'g'), item.name)
+										.replace(new RegExp(escapeRegExp('${avatar}'),'g'), item.avatar.small.image);
+						data.ul.append($(user).data('user', item));
+					});
+				}
+			},
+			onSelect: function(undefined,user, ul) { 
+				$('.event-auto-complete-friends-append-edit').bind('append', function(){
+					$('.event-load-lazy-load', this).LazyLoad();
+					$('.hide', this).removeClass('hide');
+				});
+				user_data = $(user).data('user');
+				if( $('.event-auto-complete-friends-append-edit .event-user-board-' + user_data.id).size() < 1 ) {
+					$(user).appendTo('.event-auto-complete-friends-append-edit');
+				}
+				$(ul).hide();
+			}
+		});
+	}
+});
+</script>
+<?php if(!$isXmlHttpRequest) {
+	echo '<section>';
+	echo $this->getController('home/layout/footer_part');
+} ?>

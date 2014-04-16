@@ -1,0 +1,78 @@
+
+<div class="popup">
+	<div class="head">
+		<h3 class="title-2 color-1"><?php echo $this->_('Why are you reporting this comment?');?></h3>
+	</div>
+	<div class="body">
+		<form action="<?php echo $this->getRequest()->getBaseUrl();?>?widget=pin.widget.comment&report=<?php echo $comment->id;?>" method="post" class="event-report-comment">
+			<p class="hide">
+				<input type="hidden" name="comment_id" value="<?php echo $comment->id;?>" />
+			</p>
+			<div class="mainform">
+				<?php foreach($categories AS $r => $category) { ?>
+				<div class="row">
+					<div class="cell">
+						<p class="checkgroup">
+							<label for="category-<?php echo $category->id;?>" class="radio"><input <?php if(!$r) {?>checked="checked"<?php }?> type="radio" name="report_category" value="<?php echo $category->id;?>" id="category-<?php echo $category->id;?>"><span class="icon"></span> <span class="rtext"><?php echo $category->title;?></span></label>
+						</p>
+					</div>
+				</div>
+				<?php } ?>
+				<div class="row">
+					<div class="cell">
+						<p class="checkgroup">
+							<label for="category--1" class="radio"><input type="radio" name="report_category" value="-1" id="category--1"><span class="icon"></span> <span class="rtext"><?php echo $this->_('Other');?></span></label>
+						</p>
+					</div>
+				</div>
+				<div class="row hide event-other-message">
+					<div class="cell">
+						<textarea id="f-7" class="large" name="report_message"></textarea>
+					</div>
+				</div>
+				
+				<div class="submit clearfix">
+					<button type="submit" class="event-loader button button-color-1 button-size-small"><?php echo $this->_('Save');?></button><button type="button" class="button button-color-2 button-size-small event-fancybox-close"><?php echo $this->_('Cancel');?></button>
+				</div>
+				
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+$('.event-report-comment').submit(function(){
+	App.addLoader('.event-report-comment .event-loader');
+	$('.notification.error').remove();
+	App._ajax({
+		'type' : 'POST',
+		'url' : '<?php echo $this->getRequest()->getBaseUrl();?>?widget=pin.widget.comment&report=<?php echo $comment->id;?>',
+		'data' : $(this).serialize(),
+		'onSuccess': function(json) {
+			App.removeLoader('.event-report-comment .event-loader');
+			if(json.location) {
+				window.location = json.location;
+			} else if(json.errors) {
+				var error = '';
+				for( i in json.errors ) {
+					error += json.errors[i] + '<br />';
+				}
+				$('.event-report-comment .mainform').prepend('<div class="notification error">' + error + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+			} else if(json.reported) {
+				$('.event-fancybox-close').click();
+			} else {
+				console.log(json);
+			}
+		}
+	});
+	return false;
+});
+
+$('.event-report-comment input[type=radio]').change(function(){
+	if(this.value == -1) {
+		$('.event-other-message').slideDown();
+	} else {
+		$('.event-other-message').slideUp();
+	}
+});
+</script>

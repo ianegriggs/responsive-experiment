@@ -1,0 +1,59 @@
+<?php if(!$isXmlHttpRequest) {
+	echo $this->getController('home/layout/header_part');
+	echo '<section>';
+} 
+?>
+
+<div class="popup">
+	<div class="head">
+		<h3 class="title-2 color-1"><?php echo $this->_('Add a pin from a website');?></h3>
+	</div>
+	<div class="body">
+		<form action="<?php echo $this->url(array('controller' => 'find-images'),'urlpin_c');?>" method="post" class="event-find-images">
+			<div class="mainform pinform">
+				<div class="notification success no-mtop">
+					<a href="javascript:void((function(){var%20e=document.createElement('script');e.setAttribute('type','text/javascript');e.setAttribute('charset','UTF-8');e.setAttribute('src','<?php echo preg_replace('~^https?://~', '//', $this->url(array(),'bookmarklet'));?>?r='+Math.random()*99999999);document.body.appendChild(e)})());" onclick="alert('<?php echo $this->escape($this->_('Drag and drop this button to your browser Bookmarks toolbar.'));?>'); return false;"><?php echo $this->_('Check out our bookmarklet to make pinning from a website even easier!');?></a>
+				</div>
+				<div class="row group">
+					<div class="cell">
+						<input type="text" id="f-8" class="large-with-button" placeholder="http://yoursite.com" name="url" /><button type="submit" class="event-loader button button-color-1"><?php echo $this->_('Find Images');?></button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	$('.event-find-images').submit(function(){
+		App.addLoader('.event-loader');
+		$('.notification.error').remove();
+		App._ajax({
+			url: '<?php echo $this->url(array('controller' => 'find-images'),'urlpin_c');?>',
+			onSuccess: function(json) {
+				App.removeLoader('.event-loader');
+				if(json.location) {
+					window.location = json.location;
+				} else if(json.errors) {
+					var error = '';
+					for( i in json.errors ) {
+						error += json.errors[i] + '<br />';
+					}
+					$('.event-find-images .row.group').append('<div class="notification error">' + error + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+				} else if(json.html) {
+					jQuery.fancybox.close();
+					$('section').remove();
+					$('body').append(json.html);
+				} else {
+					console.log(json);
+				}
+			},
+			type: 'POST',
+			data: $(this).serialize()
+		});
+		return false;
+	});
+</script>
+<?php if(!$isXmlHttpRequest) {
+	echo '<section>';
+	echo $this->getController('home/layout/footer_part');
+} ?>

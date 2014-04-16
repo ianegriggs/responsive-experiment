@@ -1,0 +1,124 @@
+<?php if(!$isXmlHttpRequest) {
+	echo $this->getController('home/layout/header_part');
+} 
+$userInfo = \User\User::getUserData();
+?>
+<div class="popup">
+	<div class="head">
+		<h3 class="title-2 color-1"><?php echo $this->_('Repin a Pin');?></h3>
+	</div>
+	<div class="body">
+		<form action="<?php echo $this->url(array('controller'=>'repin', 'pin_id'=>$pin->id),'pin_c');?>" method="post" id="event-form-repin">
+			<div class="mainform pinform">
+				<div class="row">
+					<div class="cell cell-addpin clearfix">
+						<?php if(!$pin['gallery']) { ?>
+						<?php 
+						$image = \Pin\Helper\Image::getImage('medium', $pin);
+						?>
+						<div class="avatar" style="background-image: url(<?php echo $image->image;?>);"></div>
+						<?php } else { ?>
+						<div class="drag-sort">
+							<ul class="event-drag-sort">
+							<?php $imageg = \Pin\Helper\Image::getImage('small', $pin);?>
+							<?php $imagebg = \Pin\Helper\Image::getImage('big', $pin);?>
+							<li class="avatar media media_0" style="background-image: url(<?php echo $imageg->image;?>);"> 
+								<input type="hidden" value="<?php echo $imagebg->image;?>" name="gallery[]" />
+							</li>
+							<?php foreach($gallery AS $image) { ?>
+							<?php $imageg = \Pin\Helper\Gallery::getImage('small', $image);?>
+							<?php $imagebg = \Pin\Helper\Gallery::getImage('big', $image);?>
+							<li class="avatar media media_<?php echo $image->id;?>" style="background-image: url(<?php echo $imageg->image;?>);"> 
+								<input type="hidden" value="<?php echo $imagebg->image;?>" name="gallery[]" />
+							</li>
+							<?php } ?>
+							</ul>
+							<div class="clear"></div>
+						</div>
+						<?php } ?>
+						<div class="data">
+							<select id="f-6" name="board_id" class="event-board-init">
+								<option value=""><?php echo $this->_('Choose Board');?></option>
+								<?php foreach($boards AS $board) { ?>
+								<option value="<?php echo $board->id;?>"><?php echo $board->title;?> <?php if($userInfo->id != $board->user_id) { echo $this->_('(Shared)');}?></option>
+								<?php } ?>
+							</select>
+							<textarea id="f-7" name="description" placeholder="<?php echo $this->_('Description');?>"><?php echo $pin->description;?></textarea>
+						</div>	
+					</div>
+					<?php if($this->errors) { ?>
+					<div class="notification error"><?php echo implode('<br />', $this->errors)?><a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>
+					<?php } ?>
+				</div>
+				<div class="submit tright">
+					<button class="event-loader button button-color-1 button-size-small"><?php echo $this->_('Pin It');?></button><button class="event-fancybox-close button button-color-2 button-size-small"><?php echo $this->_('Cancel');?></button>
+				</div>
+				<p class="hide">
+					<input type="hidden" name="X-form-cmd" value="<?php echo $this->x_form_cmd;?>" />
+					<?php 
+					$image = \Pin\Helper\Image::getImage('big', $pin);
+					?>
+					<?php if(!$pin['gallery']) { ?>
+					<input type="hidden" name="media" value="<?php echo $image->image;?>" />
+					<?php } ?>
+					<?php if($this->redirect) { ?>
+					<input type="hidden" name="redirect" value="<?php echo $this->redirect;?>" />
+					<?php } ?>
+				</p>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+$('img').LazyLoad();
+$('#event-form-repin').submit(function(){
+	App.addLoader('.event-loader');
+	$('.notification.error').remove();
+	App._ajax({
+		url: '<?php echo $this->url(array('controller'=>'repin', 'pin_id'=>$pin->id),'pin_c');?>',
+		onSuccess: function(json) {
+			App.removeLoader('.event-loader');
+			if(json.location) {
+				window.location = json.location;
+			} else if(json.errors) {
+				var error = '';
+				for( i in json.errors ) {
+					error += json.errors[i] + '<br />';
+				}
+				$('#event-form-repin .row:first').append('<div class="notification error">' + error + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+			} else if(json.pin) {
+				window.location = json.pin;
+				if(json.repin) {
+					for(i in json.repin.stats) {
+						$('.event-stats-'+json.repin.id+' .event-' + i).html(json.repin.stats[i]);
+					}
+				}
+			} else {
+				console.log(json);
+			}
+		},
+		type: 'POST',
+		data: $(this).serialize()
+	});
+	return false;
+});
+App.selectBoxWithBoard({
+	url :'<?php echo $this->url(array(),'createboard_simple');?>',
+	create:'<?php echo $this->escape($this->_('Create'));?>',
+	close:'<?php echo $this->escape($this->_('Close'));?>',
+	placeholder:'<?php echo $this->escape($this->_('Create New Board'));?>',
+	chose_category:'<?php echo $this->escape($this->_('Choose a Category'));?>',
+	categories: <?php echo \Core\Encoders\Json::encode( \Category\Category::getCategoryTreeSelect() );?>
+});
+<?php if($pin['gallery']) { ?>
+Turbo.head({
+	js: ['assets/js/jquery.dragsort.js'],
+	callback: function() {
+		$(".event-drag-sort").dragsort({ itemSelector: ".media",dragSelector: ".media", placeHolderTemplate: "<"+"li class='media'><"+"/li>" });
+	}
+});
+<?php } ?>
+</script>
+<?php if(!$isXmlHttpRequest) {
+	echo $this->getController('home/layout/footer_part');
+} ?>

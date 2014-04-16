@@ -1,0 +1,18 @@
+<?php if($comment) { ?>
+<?php $date = new \Date\Helper\Diff($comment->date_added, time()); ?>
+<?php $self_data = \User\User::getUserData(); ?>
+<li class="clearfix event<?php echo $isXmlHttpRequest;?>-comment-row">
+	<a href="<?php echo $this->url(array('user_id' => $comment->user_id,'query'=>$comment->username),'user');?>" class="avatar"><img class="event-load-lazy-load" data-original="<?php echo \User\Helper\Avatar::getImage('medium', $comment)->image;?>" src="assets/images/grey.gif" width="58" height="58" alt="Avatar" /></a>
+	<p class="meta-text-2 clearfix">
+		<?php if($self_data->id && ($self_data->id == $comment->user_id || $self_data->id == $pin->user_id || $self_data->is_admin)) { ?>
+		<?php $allow_delete = true; ?>
+		<a class="button-remove" href="javascript:;" onclick="deleteComment(<?php echo $comment->id;?>, this)"><?php echo $this->_('Remove');?></a>
+		<?php } else if($self_data->id) { ?>
+		<a class="button-report event-fancybox-ajax" href="<?php echo $this->getRequest()->getBaseUrl();?>?widget=pin.widget.comment&report=<?php echo $comment->id;?>"><?php echo $this->_('Report');?></a> 
+		<?php } ?>
+		<?php echo $this->_('just now');?>
+	</p>
+	<h3 class="title-5"><?php echo $comment->getUserFullname();?></h3>
+	<p class="comment"><?php echo nl2br($this->mentionsInput($comment->comment));?></p>	
+</li>
+<?php } ?>

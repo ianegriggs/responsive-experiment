@@ -1,0 +1,150 @@
+<?php if($users) { ?>
+<div class="no-results">
+	<div class="container">
+		<p><?php echo $this->_('Invite friends from Facebook');?></p>	
+	</div>
+</div>
+<?php $self_data = \User\User::getUserData(); ?>
+<section id="content-<?php echo $this->call;?>">
+	<div class="container fluid">
+		<div class="clearfix event-masonry-holder-<?php echo $this->call;?>">
+			<?php foreach($users AS $facebook_id => $user) { ?>
+			
+			<article class="box event-masonry-<?php echo $this->call;?> event-invite-user-<?php echo $facebook_id;?>">
+				<div class="whitebox">
+					<div class="user event-stats-user-<?php echo $facebook_id;?>">
+						<a class="avatar"><img class="event-load-lazy-load" data-original="https://graph.facebook.com/<?php echo $facebook_id;?>/picture?access_token=<?php echo $this->access_token;?>" src="assets/images/grey.gif" width="200" height="200" alt="Avatar" /></a>
+						<h3 class="title-5"><?php echo $user;?></h3>
+
+						<p><a href="javascript:;" onclick="sendRequestToRecipients(<?php echo $facebook_id;?>, '<?php echo md5($facebook_id.$self_data->id);?>');" class="button button-color-1 button-size-small"><?php echo $this->_('Invite');?></a></p>
+
+					</div>
+				</div>
+			</article>
+			<?php } ?>
+		</div>
+	</div>
+</section>
+
+
+<?php if(!$from_widget) {  ?>
+<?php ob_start();?>
+<script type="text/javascript" src="assets/js/masonry.pkgd.min.js"></script>
+<?php $this->placeholder('script',ob_get_clean());?>
+<script type="text/javascript">
+$(document).ready(function(){
+	$('.event-masonry-holder-<?php echo $this->call;?>').bind('append', function(){ 
+		$(this).find('img').LazyLoad();
+	});
+	$('.event-masonry-holder-<?php echo $this->call;?>').masonry({
+		itemSelector : '.event-masonry-<?php echo $this->call;?>',
+		isFitWidth: true,
+		transitionDuration: 0,
+		columnWidth: 236,
+		gutter: 14,
+		isOriginLeft: <?php echo $this->getModule('Language')->isRtl() ? 'false' : 'true';?>
+	});
+});
+
+
+(function() {
+	var e = document.createElement('script'); e.async = true;
+	e.src = document.location.protocol +
+	'//connect.facebook.net/en_US/all.js';
+	document.getElementsByTagName('head')[0].appendChild(e);
+} ());
+
+window.fbAsyncInit = function() {
+	FB.init({
+		appId: '<?php echo \Base\Config::get('facebook_key');?>',
+		status: true,
+		cookie: true,
+		xfbml: true
+	});
+};
+
+function sendRequestToRecipients(user_id, key) {
+
+	FB.getLoginStatus(function(response) {
+		if(response.status == 'connected') {
+			FB.api({
+				method: 'users.hasAppPermission',
+				ext_perm: 'read_friendlists'
+				}, function(response) { 
+					if(response > 0) {
+						sendData(user_id, key)
+					} else {
+						FB.login(function(response) {
+							sendData(user_id, key)
+						}, { scope: 'read_friendlists', display: 'popup' });
+					}
+			});
+		} else if(response.status == 'not_authorized') {
+			FB.login(function(response) {
+				sendData(user_id, key)
+			}, { scope: 'read_friendlists', display: 'popup' });
+		} else {
+			FB.login(function(response) {
+				sendData(user_id, key)
+			}, { scope: 'read_friendlists', display: 'popup' });
+		}
+	});
+	
+	function sendData(user_id, key) {
+		
+		<?php $avatar = \User\Helper\Avatar::getImage('medium', $self_data)->image;?>
+	  var link_url = "<?php echo $this->url(array('controller' => 'invited'),'facebook_c');?>";
+			link_url += link_url.indexOf('?')> -1 ? '&' : '?';
+			link_url += 'invited_code=' + key;
+			link_url += '&og_data[name]=<?php echo urlencode(sprintf($this->_('Join %s, the Virtual Pinboard'), \Meta\Meta::getGlobal('title')));?>';
+			link_url += '&og_data[description]=<?php echo urlencode(\Meta\Meta::getGlobal('meta_description'));?>';
+			link_url += '&og_data[picture]=<?php echo $avatar;?>';
+			link_url += '&og_data[link]=<?php echo $this->getRequest()->getBaseUrl();?>';
+
+	  FB.ui({
+		      method: "send",
+		      to: user_id,
+		      name: "<?php echo sprintf($this->_('Join %s, the Virtual Pinboard'), \Meta\Meta::getGlobal('title'));?>",
+		      description: "<?php echo \Meta\Meta::getGlobal('meta_description');?>",
+		      picture: "<?php echo $avatar;?>",
+		      link: link_url,
+		      display: 'dialog'
+	  }, function(response) {
+	      if (!response){
+	          return;
+	      }
+	
+	      App._ajax({
+			url : '<?php echo $this->url(array('controller' => 'invite'),'facebook_c');?>',
+			type: 'POST',
+			data: {id: user_id,key: key},
+			onSuccess: function(json) {
+				if(json.success) {
+					$('.event-invite-user-'+user_id).hide(function(){
+						$(this).remove().each(function(){
+							$('.event-masonry-holder-<?php echo $this->call;?>').masonry();
+						});
+	              	});
+				} else if(json.error) {
+					var error = '';
+					for( i in json.errors ) {
+						error += json.errors[i] + '<br />';
+					}
+					$('.event-masonry-holder-<?php echo $this->call;?>').append('<div class="notification error">' + error + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+				}
+			}
+	      });
+	      
+	  });
+	}
+}
+</script>
+<?php } ?>
+
+<?php } else { ?>
+<div class="no-results">
+	<div class="container">
+		<p><?php echo $this->_('No users!');?></p>	
+	</div>
+</div>
+<?php } ?>

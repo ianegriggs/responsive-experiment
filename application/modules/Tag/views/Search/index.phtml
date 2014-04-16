@@ -1,0 +1,15 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<?php echo $this->widget('pin.widget.SearchHeader'); ?>
+
+<?php 
+echo $this->widget('pin.widget.grid', array(
+	'filter' => array(
+		
+	),
+	'useIndex' => array('PRIMARY'),
+	'module' => 'search_tag'
+));
+?>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

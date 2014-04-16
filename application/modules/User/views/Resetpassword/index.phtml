@@ -1,0 +1,17 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<section id="content">
+	<div class="container bgcolor-1 radius">
+		<div class="padding-3">
+			<div class="textbox">
+				<?php if($this->errors) { ?>
+				<h1><?php echo $this->_('Error');?></h1>
+				<p><?php echo implode('<br />',$this->errors);?></p>
+				<?php } else if($this->success) { ?>
+				<h1><?php echo $this->_('Success');?></h1>
+				<p><?php echo $this->success;?></p>
+				<?php } ?>
+			</div>
+		</div>	
+	</div>
+</section>

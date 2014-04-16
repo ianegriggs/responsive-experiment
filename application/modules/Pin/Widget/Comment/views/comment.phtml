@@ -1,0 +1,180 @@
+<?php if(!$from_widget) { ?>
+<div class="event-comment-holder center">
+	<script type="text/javascript">
+	App._ajax({
+		'url' : '<?php echo $this->getRequest()->getBaseUrl();?>?widget=pin.widget.comment&<?php echo $query;?>',
+		onSuccess: function(data) {
+			$('.event-comment-holder').replaceWith(data);
+		}
+	});
+	</script>
+	<img src="assets/images/loaders/spinning-loader.svg" width="50" style="margin: auto;">
+</div>
+<?php } else if($this->pin && $this->pin->id) { ?>
+<?php $self_data = \User\User::getUserData(); ?>
+<?php if(($comments && $comments->count()) || $self_data->id) { ?>
+<ul class="comments event<?php echo $isXmlHttpRequest;?>-comments-group">
+	<?php foreach($comments AS $comment) { 
+		$date = new \Date\Helper\Diff($comment->date_added, time());
+	?>
+	<li class="clearfix event<?php echo $isXmlHttpRequest;?>-comment-row">
+		<a href="<?php echo $this->url(array('user_id' => $comment->user_id,'query'=>$comment->username),'user');?>" class="avatar"><img class="event-load-lazy-load" data-original="<?php echo \User\Helper\Avatar::getImage('medium', $comment)->image;?>" src="assets/images/grey.gif" width="58" height="58" alt="Avatar" /></a>
+		
+			<?php if($self_data->id && ($self_data->id == $comment->user_id || $self_data->id == $this->pin->user_id || $self_data->is_admin)) { ?>
+		<p class="meta-text-2 clearfix button-remove-wrapper">
+			<a class="button-remove" href="javascript:;" onclick="deleteComment(<?php echo $comment->id;?>, this)"><?php echo $this->_('Remove');?></a>
+			<?php } else if($self_data->id) { ?>
+		<p class="meta-text-2 clearfix">
+			<a class="button-report event-fancybox-ajax" href="<?php echo $this->getRequest()->getBaseUrl();?>?widget=pin.widget.comment&report=<?php echo $comment->id;?>"><?php echo $this->_('Report');?></a> 
+			<?php } else { ?>
+		<p class="meta-text-2 clearfix">	
+			<?php } ?>
+			<?php echo sprintf($this->_('%d %s ago'), $date->getSingle()->value, $this->_($date->getSingle()->key));?>
+		</p>
+		<h3 class="title-5"><?php echo $comment->getUserFullname();?></h3>
+		<p class="comment"><?php echo nl2br($this->mentionsInput($comment->comment));?></p>	
+	</li>
+	<?php } ?>
+	<?php if($self_data->id) { ?>
+	<li class="clearfix event<?php echo $isXmlHttpRequest;?>-comment-formholder">
+		<form action="<?php echo $this->getRequest()->getBaseUrl();?>?widget=pin.widget.comment&addComment" method="post" onsubmit="return false;">
+			<p class="hide">
+				<input name="pin_id" value="<?php echo $this->pin->id;?>" type="hidden" />
+				<?php if($isXmlHttpRequest) { ?>
+				<input name="isXmlHttpRequest" value="true" type="hidden" />
+				<?php } ?>
+			</p>
+			<a href="<?php echo $this->url(array('user_id' => $self_data->id,'query'=>$self_data->username),'user');?>" class="avatar"><img class="event-load-lazy-load" data-original="<?php echo \User\Helper\Avatar::getImage('medium', $self_data)->image;?>" src="assets/images/grey.gif" width="58" height="58" alt="Avatar" /></a>
+			<h3 class="title-5"><?php echo $self_data->getUserFullname();?></h3>
+			<div class="comment"><textarea class="full" name="comment" placeholder="<?php echo $this->_('Add a comment...');?>"></textarea></div>	
+			<div class="submit margin-top-10">
+				<button type="submit" class="event-loader button button-color-1 button-size-small"><?php echo $this->_('Save');?></button>
+			</div>
+		</form>
+	</li>
+	<?php } ?>
+</ul>
+
+<script type="text/javascript">
+$('.event-load-lazy-load').LazyLoad();
+</script>
+<?php if($self_data->id) { ?>
+<script type="text/javascript">
+head.js(
+		{'underscore':'<?php echo $this->widgetScript(dirname(__DIR__) . '/jquery-mentions/underscore-min.js');?>'},
+		{'events.input':'<?php echo $this->widgetScript(dirname(__DIR__) . '/jquery-mentions/lib/jquery.events.input.js');?>'},
+		{'elastic':'<?php echo $this->widgetScript(dirname(__DIR__) . '/jquery-mentions/lib/jquery.elastic.js');?>'},
+		{'mentionsInput':'<?php echo $this->widgetScript(dirname(__DIR__) . '/jquery-mentions/jquery.mentionsInput.js');?>'},
+		function() {
+			$('.event<?php echo $isXmlHttpRequest;?>-comment-formholder textarea').mentionsInput({
+			    onDataRequest:function (mode, query, callback) {
+			        $.getJSON('<?php echo $this->url(array('controller' => 'friends'),'user_c');?>', {query:query}, function(responseData) {
+			          	responseData = _.filter(responseData, function(item) { return item.name.toLowerCase().indexOf(query.toLowerCase()) > -1 });
+			          	callback.call(this, responseData);
+			        });
+				},
+				templates: {
+					autocompleteListItemAvatar : _.template('<p class="avatar"><img src="<%= avatar.small.image %>" /></p>'),
+					mentionsOverlay            : _.template('<div class="mentions-comments"><div></div></div>'),
+					mentionItemHighlight       : _.template('<strong><span><%= value %></span><input type="hidden" name="friends[<%= id %>]" value="<%= value %>"></strong>'),
+					autocompleteListItem       : _.template('<li data-ref-id="<%= id %>" data-ref-type="<%= type %>" data-display="<%= display %>"><span class="content"><%= content %></span></li>')
+				}
+			}).keydown(function(e){
+				var list = $('.mentions-autocomplete-list ul');
+				if(list.size() > 0 && (e.keyCode == 38 || e.keyCode == 40)) {
+					$('.mentions-autocomplete-list').animate({
+				        scrollTop:  $('.mentions-autocomplete-list ul').scrollTop() - $('.mentions-autocomplete-list ul').offset().top + list.find('.active').offset().top 
+				    }, 200); 
+				}
+			});
+		});
+
+$('.event<?php echo $isXmlHttpRequest;?>-comment-formholder form').submit(function(){
+	App.addLoader('.event<?php echo $isXmlHttpRequest;?>-comment-formholder .event-loader');
+	$('.notification.error').remove();
+	App._ajax({
+		'type' : 'POST',
+		'url' : '<?php echo $this->getRequest()->getBaseUrl();?>?widget=pin.widget.comment&addComment',
+		'data' : $(this).serialize(),
+		'onSuccess': function(json) {
+			App.removeLoader('.event<?php echo $isXmlHttpRequest;?>-comment-formholder .event-loader');
+			if(json.location) {
+				window.location = json.location;
+			} else if(json.errors) {
+				var error = '';
+				for( i in json.errors ) {
+					error += json.errors[i] + '<br />';
+				}
+				$('.event<?php echo $isXmlHttpRequest;?>-comment-formholder').append('<div class="notification error">' + error + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>');
+			} else if(json.html) {
+				$('.event<?php echo $isXmlHttpRequest;?>-comment-formholder form textarea').val('').height('auto').mentionsInput('reset');
+				$('.event<?php echo $isXmlHttpRequest;?>-comments-group').prepend(json.html).find('.event-load-lazy-load').LazyLoad();
+				if(json.infouser) {
+					for(i in json.infouser.stats) {
+						$('.event-stats-user-'+json.infouser.id+' .event-' + i).html(json.infouser.stats[i]);
+					}
+				}
+				if(json.info) {
+					for(i in json.info.stats) {
+						$('.event-stats-'+json.info.id+' .event-' + i).html(json.info.stats[i]);
+					}
+				}
+			} else {
+				console.log(json);
+			}
+		}
+	});
+	return false;
+});
+</script>
+<?php } ?>
+<script type="text/javascript">
+window.deleteComment = window.deleteComment || function(id, self){
+	var self = $(self);
+
+	$.fancybox( $( '#dialog-confirm' ) ,{
+		afterShow: function() {
+		      $('.event-dialog-close').click(function() { jQuery.fancybox.close(); });
+		      $('.event-dialog-ok').click(function() { 
+		    	  $('.notification.error').remove();
+			  		App._ajax({
+			  			url : '<?php echo $this->getRequest()->getBaseUrl();?>?widget=pin.widget.comment&delete=' + id,
+			  			onSuccess: function(json) {
+			  				if(json.location) {
+			  					window.location = json.location;
+			  				} else if(json.error) {
+			  					$('<div class="notification error">' + json.error + '<a class="button-close" href="javascript:void(0);"><?php echo $this->escape($this->_('Close'));?></a></div>').insertBefore('.event-comments-group');
+			  				} else if(json.deleted) {
+			  					self.parents('.event<?php echo $isXmlHttpRequest;?>-comment-row').slideUp(function(){
+			  						$(this).remove();
+			  					});
+			  				} else {
+			  					console.log(json);
+			  				}
+			  			}
+			  		});
+			  		jQuery.fancybox.close(); 
+			  });
+		  }
+	 });
+};
+</script>
+<div id="dialog-confirm" class="popup hide">
+	<div class="head">
+		<h3 class="title-2 color-1"><?php echo $this->_('Delete this comment?');?></h3>
+	</div>
+	<div class="body">
+		<div class="textbox">
+			<p><?php echo $this->_('You won\'t be able to undo this.'); ?></p>
+		</div>
+		<div class="mainform">
+			<div class="submit tright">
+				<button class="event-dialog-close button button-color-2 button-size-small"><?php echo $this->_('Cancel');?></button>
+				<button class="event-dialog-ok button button-color-1 button-size-small"><?php echo $this->_('Delete');?></button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<?php } ?>
+<?php } ?>

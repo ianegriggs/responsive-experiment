@@ -1,0 +1,58 @@
+<?php if($pins && $pins->count()) { ?>
+<?php $self_data = \User\User::getUserData(); ?>
+<div class="whitebox">
+	<p class="meta-text-2 no-strong"><?php echo $this->_('Other pins from');?></p>
+	<h3 class="title-5 clearfix event-stats-board-<?php echo $board->id;?>"> <a href="<?php echo $this->url(array('board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board');?>"><?php echo $board->title;?></a> <span class="meta-text no-strong event-pins"><?php echo $board->pins;?></span></h3>
+	<div class="gallery">
+		<a href="javascript:;" class="button button-gallery button-gallery-prev event-gallery-prev-from-board<?php echo $board->id;?>">&nbsp;</a>
+		<ul class="clearfix event-board<?php echo $board->id;?>-pins">
+			<?php foreach($pins AS $pin) {  ?>
+			<li><a class="event-turbo-click event-history event-width-100 event-no-loader" href="<?php echo $this->url(array('pin_id'=>$pin->id),'pin');?>"<?php if($popup) { ?> data-popup="true"<?php } ?>><img class="event-load-lazy-load" width="78" height="78" alt="Thumb" src="assets/images/grey.gif" data-original="<?php echo \Pin\Helper\Image::getImage('small', $pin)->image;?>" onload="$(this).LazyLoad();" /></a></li>
+			<?php } ?>
+		</ul>
+		<a href="javascript:;" class="button button-gallery button-gallery-next event-gallery-next-from-board<?php echo $board->id;?>">&nbsp;</a>
+	</div>
+	<?php if(!$self_data->id) { ?>
+	<p class="followbutton"><a data-userid="<?php echo $board->user_id;?>" href="<?php echo $this->url(array('controller' => 'login', 'query' => '?next=' . urlencode($this->url(array('board_id'=>$board->id,'query'=>$this->urlQuery($board->title)),'board'))),'user_c',false,false);?>" class="button button-color-1 button-size-small"><?php echo $this->_('Follow');?></a></p>
+	<?php } else if($self_data->id != $board->user_id && $board->following_board) { ?>
+	<p class="followbutton"><a data-userid="<?php echo $board->user_id;?>" data-boardid="<?php echo $board->id;?>" href="<?php echo $this->url(array('board_id' => $board->id,'controller'=>'follow','query'=>$this->urlQuery($board->title)),'board_c');?>" class="event-follow-board button button-color-2 button-size-small" data-textactive="<?php echo $this->_('Unfollow');?>" data-textinactive="<?php echo $this->_('Follow');?>"><?php echo $this->_('Unfollow');?></a></p>
+	<?php } else if($self_data->id != $board->user_id) { ?>
+	<p class="followbutton"><a data-userid="<?php echo $board->user_id;?>" data-boardid="<?php echo $board->id;?>" href="<?php echo $this->url(array('board_id' => $board->id,'controller'=>'follow','query'=>$this->urlQuery($board->title)),'board_c');?>" class="event-follow-board button button-color-1 button-size-small" data-textactive="<?php echo $this->_('Unfollow');?>" data-textinactive="<?php echo $this->_('Follow');?>"><?php echo $this->_('Follow');?></a></p>
+	<?php } ?>
+</div>
+<script type="text/javascript">
+var cachedDataBoard<?php echo $board->id;?> = {'1' : $('.event-board<?php echo $board->id;?>-pins').get(0).outerHtml}, page=1;
+$('.event-gallery-prev-from-board<?php echo $board->id;?>').click(function() {
+	var self = this;
+	App.addLoaderFull(self);
+	page--;
+	if(page < 1) {
+		page = 1;
+	}
+	if(cachedDataBoard<?php echo $board->id;?>[page]) {
+		$('.event-board<?php echo $board->id;?>-pins').replaceWith(cachedDataBoard<?php echo $board->id;?>[page]);
+	}
+	App.removeLoader(self);
+});
+$('.event-gallery-next-from-board<?php echo $board->id;?>').click(function() {
+	var self = this;
+	App.addLoaderFull(self);
+	page++;
+	if(cachedDataBoard<?php echo $board->id;?>[page]) {
+		App.removeLoader(self);
+		$('.event-board<?php echo $board->id;?>-pins').replaceWith(cachedDataBoard<?php echo $board->id;?>[page]);
+	} else {
+		App._ajax({
+			'url' : '?widget=board.widget.otherpins&board_id=<?php echo $board->id;?>&page='+ page + '&limit=<?php echo $this->limit;?><?php if($popup) { ?>&popup=true<?php } ?>',
+			'onSuccess': function(data) {
+				if(data) {
+					cachedDataBoard<?php echo $board->id;?>[page] = data;
+					$('.event-board<?php echo $board->id;?>-pins').replaceWith(data);
+				}
+				App.removeLoader(self);
+			}
+		});
+	}
+});
+</script>
+<?php } ?>

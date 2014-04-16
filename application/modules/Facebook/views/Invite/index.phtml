@@ -1,0 +1,41 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<?php echo $this->widget('invite.widget.inviteheader'); ?>
+
+<?php if($this->is_loged) { ?>
+<?php 
+echo $this->widget('facebook.widget.grid', array(
+	'call' => 'forInvate'
+));
+?>
+
+<?php 
+echo $this->widget('facebook.widget.grid', array(
+	'call' => 'fromUser'
+));
+?>
+<?php } else { ?>
+
+<section id="content">
+	<div class="container bgcolor-1 radius">
+		<div class="padding-3">
+			<div class="textbox">
+				<h2><?php echo sprintf($this->_('We couldn\'t find any of your Facebook friends because you haven\'t connected Facebook and %s.'), \Meta\Meta::getGlobal('title'));?></h2>
+				
+				<p class="socrow clearfix center">
+					<a href="javascript:;" class="event-connect button button-color-4 button-facebook"><?php echo $this->_('Find Facebook friends');?></a>
+				</p>
+			</div>
+		</div>	
+	</div>
+</section>
+<script type="text/javascript" src="assets/js/facebook.js"></script>
+<script type="text/javascript">
+$('.event-connect').click(function(){
+	Facebook.startFacebookConnect("<?php echo $this->url(array('controller'=>'connect'),'facebook_c');?>","email,user_likes,user_birthday,offline_access,read_friendlists", false, true, "<?php echo $this->url(array('controller'=>'connect'),'facebook_c');?>");
+});
+</script>
+
+<?php } ?>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

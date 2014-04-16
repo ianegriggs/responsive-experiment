@@ -1,0 +1,33 @@
+<script type="text/javascript">
+image_upload = function(field, preview) {
+	$('<div id="myelfinder" />').elfinder({
+		url : '<?php echo $this->url(array('module' => 'filemanager'),'admin_module');?>',
+		lang : 'en',
+		dialog : { width : 900, modal : true, title : '<?php echo $this->_('WM Cms - file manager for web');?>' },
+		closeOnEditorCallback : true,
+		editorCallback : function(selected){
+			if(!selected || !selected.split('?') || !selected.split('?')[0]) return;
+			file = selected.split('?')[0].replace(/^uploads\/data\//,'');
+			$('#' + preview).attr('src',selected);
+			$('#' + field).attr('value', file);
+		}
+	});
+};
+</script>
+<?php $user_data = \User\User::getUserData(); ?>
+<div id="menu">
+	<div class="w90p">
+		<?php echo $this->widget('admin.widget.menu');?>
+        <div class="fright">
+			<ul>
+				<li><a><strong><?php echo sprintf($this->_('Welcome %s'), $user_data->getUserFullname());?></strong></a></li>
+				<li><a target="_blank" href="./"><img src="cms/admin/images/view-site.png" alt="" class="icon"><?php echo $this->_('Go to the site');?></a></li>
+				<li><a href="<?php echo $this->url(array('controller' => 'login','action'=>'logout'),'user_c_a');?>"><img src="cms/admin/images/log-out.png" alt="" class="icon"><?php echo $this->_('Logout');?></a></li>
+			</ul>
+		</div>
+    	<div class="clear"></div>
+	</div>
+</div>
+
+<div id="content">  <!-- Start Content-->
+	<div class="wrap">

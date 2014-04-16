@@ -1,0 +1,64 @@
+<?php echo $this->getController('home/layout/header_part_short'); ?>
+
+<section id="content">
+	<?php 
+		$menu = \Base\Menu::getMenu('oAuth');	
+		if($menu) {
+	?>
+	<div class="container mobile bgcolor-1 padding-4 radius arrow-left">
+		<span class="sticky-icon-soc"></span>
+		<div class="registerform">
+			<div class="row">
+				<p class="center"><?php echo $this->_('Connect with');?></p>
+			</div>
+			<?php for($i = 0, $j = 0; $i < ceil(count($menu)/2); $i++ ) { ?>
+			<div class="row socrow clearfix <?php if(!isset($menu[$j+1])) { echo 'center'; }?>">
+				<?php for($r = 0; $r < 2; $r++, $j++ ) { ?>
+				<?php if(isset($menu[$j])) { $class = $r == 1 ? 'fright' : ''; if($r == 0 && isset($menu[$j+1])) { $class = 'fleft'; } echo $this->widget($menu[$j]->widget, array('class' => $class, 'method' => 'login')); } ?>
+				<?php } ?>
+			</div>
+			<?php } ?>
+		</div>
+	</div>
+	
+	<?php } ?>
+	
+	<div class="container mobile">
+		<div class="registerform">
+			<div class="row">
+				<p class="center"><?php echo sprintf($this->_('Request an invite for registration in %s'), \Meta\Meta::getGlobal('title'));?></p>
+			</div>
+		</div>	
+	</div>
+	
+	<div class="container mobile bgcolor-1 padding-4 radius arrow-left">
+		<span class="sticky-icon-logreg"></span>
+		<div class="registerform">
+			<form action="<?php echo $this->url(array('controller' => 'request'),'invite_c');?>" method="post">
+				<?php if($this->errors) { ?>
+				<div class="notification error no-mtop">
+					<?php echo implode('<br />', $this->errors);?>
+					<a class="button-close" href="javascript:;"><?php echo $this->_('Close')?></a>
+				</div>
+				<?php } else if($this->success) { ?>
+				<div class="notification success color-7">
+					<?php echo $this->success;?>
+					<a class="button-close" href="javascript:;"><?php echo $this->_('Close')?></a>
+				</div>
+				<?php } ?>
+				<div class="row">
+					<input type="text" name="email" value="<?php echo $this->getRequest()->getPost('email')?>" placeholder="<?php echo $this->escape($this->_('E-mail'));?>" class="icon-input-user<?php if(isset($this->errors['email'])) { echo ' error-field'; }?>" />
+				</div>
+				<div class="row">
+					<button class="button button-color-1 button-size-large"><?php echo $this->_('Send');?></button>
+				</div>
+				<p class="hide">
+					<input type="hidden" name="X-form-cmd" value="<?php echo $this->x_form_cmd;?>" />
+				</p>
+			</form>
+		</div>
+	</div>
+
+</section>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

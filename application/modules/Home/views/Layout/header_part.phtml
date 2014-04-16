@@ -1,0 +1,174 @@
+<?php $user_data = \User\User::getUserData(); ?>
+<input type="checkbox" id="checkbox-menu" class="hide" />
+<header class="event-header-scroll">
+	<div class="container fluid clearfix">
+		<nav class="menu">
+			<ul class="clearfix">
+				<li>
+					<label class="icon-menu" for="checkbox-menu"><?php echo $this->_('Menu');?></label>
+				</li>
+			</ul>
+		</nav>
+		<!-- <?php if($this->hide_brand !== true) { ?>
+		<p class="poweredby">
+			<a onclick="window.open('http://pintastic.com'); return false;" href="http://pintastic.com/">Powered by pintastic.com</a> -->
+		</p>
+		<?php } ?>
+		<?php 
+			$menu = \Base\Menu::getMenu('BaseMenu');	
+		if($menu) {
+		?>
+		<aside class="sidebar">
+			<ul class="clearfix">
+				<?php 
+					foreach($menu AS $row => $widget) {
+						if($widget->is_widget) {
+							$config = array();
+							if($widget->config) {
+								$config = unserialize($widget->config);
+							}
+							$config['instance'] = $widget;
+							$config['is_group'] = $row ? $widget->is_group : false;
+							echo $this->widget($widget->widget, $config);
+						} else { ?>
+							<li <?php if($row ? $widget->is_group : false) { ?>class="group"<?php } ?>>
+								<a href="<?php echo $this->url((array)$widget->route, $widget->widget);?>" class="icon-<?php echo $widget->widget;?>"><?php echo $this->_($widget->title);?></a>
+							</li>
+					<?php }
+					}
+				?>
+			</ul>
+		</aside>
+		<?php } ?>
+		
+		<p class="logo">
+			<a href="<?php echo $this->url(array(),'welcome_home');?>">
+				<?php if(\Base\Config::get('site_logo')) { ?>
+				<img src="uploads/data/<?php echo \Base\Config::get('site_logo');?>" alt="<?php echo \Meta\Meta::getGlobal('title');?>">
+				<?php } else { ?>
+				<img src="assets/images/logo.png" width="113" height="30" alt="<?php echo \Meta\Meta::getGlobal('title');?>">
+				<?php } ?>
+			</a>
+		</p>
+		<nav class="usermenu" id="nav" role="navigation">
+			<ul class="clearfix">
+				<?php 
+					//check is user login
+					if($user_data->id) { 
+					$menu = \Base\Menu::getMenu('UserMenu');
+				?>
+				<li>
+					<a href="<?php echo $this->url(array('user_id' => $user_data->id,'query'=>$user_data->username),'user');?>" class="member"><img class="event-avatar" src="assets/images/grey.gif" data-original="<?php echo \User\Helper\Avatar::getImage('small', $user_data)->image;?>" width="60" height="60" alt="<?php echo $user_data->getUserFullname();?>"></a>
+					<nav class="dropdown" id="nav" role="navigation">
+						<div class="dropdown-wrapper arrow-up">
+							<ul class="userlinks stronglinks">
+								<?php 
+									foreach($menu AS $row=>$widget) {
+										if($widget->is_widget) {
+											$config = array();
+											if($widget->config) {
+												$config = unserialize($widget->config);
+											}
+											$config['instance'] = $widget;
+											$config['is_group'] = $row ? $widget->is_group : false;
+											echo $this->widget($widget->widget, $config);
+										} else { ?>
+											<li <?php if($row ? $widget->is_group : false) { ?>class="group"<?php } ?>>
+												<?php $route = (array)unserialize($widget->route);?>
+												<?php $class = $widget->id;?>
+												<a href="<?php echo $this->url($route+array('user_id' => $user_data->id,'query'=>$user_data->username), $widget->widget);?>" class="icon-usermenu-<?php echo $class;?>"><?php echo $this->_($widget->title);?></a>
+											</li>
+									<?php }
+									}
+								?>
+								<li><a href="<?php echo $this->url(array('controller' => 'login','action'=>'logout'),'user_c_a');?>" class="icon-logout"><?php echo $this->_('Log Out');?></a></li>
+							</ul>
+						</div>
+					</nav>
+				</li>
+				<?php } /*end user login check*/ else { ?>
+				<li><a href="<?php echo $this->url(array('controller' => 'login'),'user_c');?>" class="icon icon-login event-fancybox"><?php echo $this->_('Login');?></a></li>
+				<?php } //end user is login for hide login link?>
+				<?php 
+					$menu = \Base\Menu::getMenu('TopMenu');
+					foreach($menu AS $row=>$widget) {
+						if($widget->is_widget) {
+							$config = array();
+							if($widget->config) {
+								$config = unserialize($widget->config);
+							}
+							$config['instance'] = $widget;
+							$config['is_group'] = $row ? $widget->is_group : false;
+							echo $this->widget($widget->widget, $config);
+						} else { ?>
+							<li <?php if($row ? $widget->is_group : false) { ?>class="group"<?php } ?>>
+								<?php $route = (array)unserialize($widget->route);?>
+								<?php $class = $widget->id;?>
+								<a href="<?php echo $this->url($route+array('user_id' => $user_data->id,'query'=>$user_data->username), $widget->widget);?>" class="icon-usermenu-<?php echo $class;?>"><?php echo $this->_($widget->title);?></a>
+							</li>
+					<?php }
+					}
+					
+					//check is user login
+					if($user_data->id) { 
+				?>
+				
+				<?php 
+					$menu = \Base\Menu::getMenu('AddMenu');	
+				if($menu) {
+				?>
+				<li>
+					<a href="javascript:;" class="icon icon-add"><?php echo $this->_('Add');?></a>
+					<nav class="dropdown">
+						<div class="dropdown-wrapper arrow-up">
+							<ul class="addpin stronglinks">
+								<li>
+									<a href="javascript:void((function(){var%20e=document.createElement('script');e.setAttribute('type','text/javascript');e.setAttribute('charset','UTF-8');e.setAttribute('src','<?php echo preg_replace('~^https?://~', '//', $this->url(array(),'bookmarklet'));?>?r='+Math.random()*99999999);document.body.appendChild(e)})());" onclick="alert('<?php echo $this->escape($this->_('Drag and drop this button to your browser Bookmarks toolbar.'));?>'); return false;" class="icon-pinit" title="<?php echo $this->_('Drag me to your Bookmarks Bar!');?>"><?php echo $this->_('PinIt Button');?></a>
+								</li>
+								<?php 
+									foreach($menu AS $widget) {
+										if($widget->is_widget) {
+											$config = array();
+											if($widget->config) {
+												$config = unserialize($widget->config);
+											}
+											$config['instance'] = $widget;
+											$config['is_group'] = $widget->is_group;
+											echo $this->widget($widget->widget, $config);
+										} else { ?>
+											<li>
+												<a href="<?php echo $this->url((array)unserialize($widget->route), $widget->widget);?>" class="event-fancybox-ajax icon-<?php echo $widget->widget;?>"><?php echo $this->_($widget->title);?></a>
+											</li>
+									<?php }
+									}
+								?>
+							</ul>
+						</div>
+					</nav>
+				</li>
+				<?php } ?>
+				<?php } //end user login check?>
+				<li>
+					<?php echo $this->widget('search.widget.searchbox');?>
+				</li>
+			</ul>
+		</nav>	
+	</div>
+</header>
+
+<?php 
+$menu = \Base\Menu::getMenu('headerBottom');
+if($menu) {
+	foreach($menu AS $widget) {
+		if($widget->is_widget) {
+			$config = array();
+			if($widget->config) {
+				$config = unserialize($widget->config);
+			}
+			$config['instance'] = $widget;
+			$config['is_group'] = $widget->is_group;
+			$config['requestparameters'] = $this->getRequest()->getParams();
+			echo $this->widget($widget->widget, $config);
+		}
+	}
+} ?>

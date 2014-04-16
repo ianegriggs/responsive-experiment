@@ -1,0 +1,11 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<?php echo $this->widget('pin.widget.grid', array(
+	'filter' => array(
+		'video' => 1		
+	),
+	'useIndex' => array('PRIMARY','video')
+));
+?>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

@@ -1,0 +1,20 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<section id="content">
+	<div class="container bgcolor-1 radius">
+		<div class="padding-3">
+			<div class="textbox">
+				<h1><?php echo $this->_('Error');?></h1>
+				
+				<?php if($errors) { ?>
+				<?php foreach($errors AS $error) { ?>
+				<p><?php echo $error->message;?></p>
+				<?php } ?>
+				<p class="socrow clearfix center">
+					<?php echo $this->widget('twitter.widget.oauth', array('method' => 'login'));?>
+				</p>
+				<?php } ?>
+			</div>
+		</div>	
+	</div>
+</section>

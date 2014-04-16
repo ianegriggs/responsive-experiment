@@ -1,0 +1,16 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<?php echo $this->widget('pin.widget.SearchHeader'); ?>
+
+<?php 
+$pinsTable = new \Pin\Pin();
+$query = $this->getRequest()->getRequest('query');
+echo $this->widget('user.widget.grid', array(
+	'filter' => array(
+		'query' => $query	
+	),
+	'useIndex' => array('PRIMARY','search')
+));
+?>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

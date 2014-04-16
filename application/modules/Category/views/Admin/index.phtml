@@ -1,0 +1,55 @@
+<?php echo $this->getController('admin/layout/header_part'); ?>
+
+<?php 
+$self = $this;
+echo $this->widget('widget.grid.db', array(
+	'head' => array(
+		'title' => $this->_('Categories'),
+		'icon' => 'cms/admin/images/question-type-multiple-correct.png'
+	),
+	'atributes' => 'class="display"',
+	'dataProvider' => new \Category\Category(),
+	'checkbox' => true,
+	'columns' => array(
+		array(
+			'atributes' => 'class="left" style="width:50px;"',
+			'name' => 'id',
+			'label' => '#'
+		),
+		array(
+			'atributes' => 'class="left"',
+			'name' => 'date_added',
+			'label' => $this->_('Title'),
+			//'virtual' => array('title' => 'Category\CategoryDescription'),
+			'value' => function($data) use($self) {
+				return '<a href="'.$self->url(array('module'=>'category','query'=>'filter[parent_id]='.$data->id),'admin_module',false,false).'">' . \Category\Category::getPathFromChild($data->id) . '</a>';
+			},
+			'filter' => false
+		),
+	),
+	'filter' => array(
+		'parent_id' => $this->getRequest()->getQuery('filter[parent_id]')
+	),
+	'has_delete' => function($data) {
+		$delete = true;
+		$categoryTable = new \Category\Category();
+		if($categoryTable->countByParentId($data->id)) {
+			$delete = false;
+		} else {
+			$pinTable = new \Pin\Pin();
+			if($pinTable->countByCategoryId($data->id)) {
+				$delete = false;
+			}
+		}
+		return $delete;
+	},
+	'onDelete' => function($items, $self) {
+		/*foreach($items AS $item) {
+			var_dump($item, $self->getVar('referenceMap'), $self->getVar('referenceMapHelp')); exit;
+		}*/
+	}
+));
+
+?>
+
+<?php echo $this->getController('admin/layout/footer_part'); ?>

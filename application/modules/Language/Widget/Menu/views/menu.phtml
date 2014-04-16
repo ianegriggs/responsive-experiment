@@ -1,0 +1,20 @@
+<?php if($languages && count($languages) > 1) { ?>
+<li <?php if($this->is_group) { ?>class="group"<?php } ?>>
+	<a href="javascript:void(0);" class="icon-language"><?php echo $this->_('Language');?></a>
+	<nav class="dropdown">
+		<div class="dropdown-wrapper arrow-left">
+			<ul class="languages">
+				<?php foreach ($languages AS $language) { ?>
+				<li><a href="javascript:void(0)" onclick="$('#language_switch').val('<?php echo $language->id;?>');$('#language_switch_form').submit();" style="background-image: url('assets/images/flags/<?php echo $language->image;?>')"><?php echo $language->name;?></a></li>
+				<?php } ?>
+			</ul>
+		</div>
+	</nav>
+	<form action="" method="post" class="hide" id="language_switch_form">
+		<p>
+			<input name="language_switch" type="hidden" value="true" />
+			<input name="language_id" type="hidden" value="" id="language_switch" />
+		</p>
+	</form>
+</li>
+<?php } ?>

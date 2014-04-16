@@ -1,0 +1,34 @@
+<div class="popup">
+	<div class="head">
+		<h3 class="title-2 color-1"><?php echo $this->_('Success! Your pin was pinned!');?></h3>
+	</div>
+	<div class="body">
+		<div class="mainform pinform">
+			<div class="row">
+				<div class="cell cell-addpin clearfix">
+					
+			<p>
+						<a class="button button-color-1 event-see-pin" href="<?php echo $this->url(array('pin_id'=>\Core\Session\Base::get('bookmarklet_pin_id')),'pin');?>"><?php echo $this->_('See your Pin');?></a>
+						<a class="button button-color-2 event-window-close" href="javascript:;"><?php echo $this->_('Close');?></a>
+					</p>
+						
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$('body').removeClass('pad-1').css({overflow:'hidden','padding-bottom':0});
+	window.resizeTo(600,215);
+	$('.event-window-close').click(function() {
+		window.close();
+	});
+	$('.event-see-pin').click(function(){
+		window.open(this.href);
+		window.close();
+		return false;
+	});
+	setTimeout(function(){
+		window.close();
+	}, 3000);
+</script>

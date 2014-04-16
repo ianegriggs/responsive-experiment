@@ -1,0 +1,249 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<section class="bgcolor-1" id="headbar">
+	<div class="container">
+		<h1 class="title-9"><?php echo $this->_('Account Settings');?><?php if(!$self_edit) { ?> / <?php echo $user->getUserFullname();?><?php } ?></h1>
+	</div>
+</section>
+
+<?php 
+$demo_user_id = \Base\Config::get('demo_user_id');
+if($demo_user_id && $demo_user_id == \User\User::getUserData()->id) {
+?>
+<div class="notification error">
+	<?php echo $this->_('You don\'t have permissions for this action!');?>
+</div>
+<?php } else { ?>
+<form action="<?php echo $this->url(array('user_id' => $user->id),'settings');?>" method="post">
+	<section id="content">
+		<div class="container table bgcolor-1 padding-3 radius">
+			<div class="titlebar">
+				<h2 class="title-2"><?php echo $this->_('Basic Info');?></h2>
+			</div>
+			<div class="mainform">
+				<p class="hide">
+					<input type="hidden" name="X-form-cmd" value="<?php echo $this->x_form_cmd;?>" />
+				</p>
+				<?php if($this->errors) { ?>
+				<div class="notification error">
+					<?php echo implode('<br />', $this->errors);?>
+					<a class="button-close" href="javascript:;"><?php echo $this->_('Close')?></a>
+				</div>
+				<?php } else if($this->success) { ?>
+				<div class="notification success color-7">
+					<?php echo $this->success;?>
+					<a class="button-close" href="javascript:;"><?php echo $this->_('Close')?></a>
+				</div>
+				<?php } ?>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-1" class="caption"><?php echo $this->_('Name');?></label>
+					</div>
+					<div class="cell">
+						<input type="text" id="f-1" class="middle" name="firstname" value="<?php echo $user->firstname;?>" /><input type="text" class="middle" name="lastname" value="<?php echo $user->lastname;?>" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-2" class="caption"><?php echo $this->_('Username');?></label>
+					</div>
+					<div class="cell">
+						<input type="text" id="f-2" class="middle<?php if(isset($this->errors['username'])) { echo ' error-field'; }?>" name="username" value="<?php echo $user->username;?>" /><span class="helptext"><?php echo $this->getRequest()->getBaseUrl();?>user/ID/username</span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-3" class="caption"><?php echo $this->_('E-mail Address');?></label>
+					</div>
+					<div class="cell">
+						<input type="text" id="f-3" class="large<?php if(isset($this->errors['email'])) { echo ' error-field'; }?>" name="email" value="<?php echo $user->email;?>" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label class="caption"><?php echo $this->_('Password');?></label>
+					</div>
+					<div class="cell">
+						<p class="text"><a href="<?php echo $this->url(array('controller' => 'password', 'user_id' => $user->id),'settings_c');?>" class="color-4"><strong><?php echo $this->_('Change your password...');?></strong></a></p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-4" class="caption"><?php echo $this->_('Language');?></label>
+					</div>
+					<div class="cell">
+						<select class="large" id="f-4" name="language_id">
+							<?php foreach($languages AS $language) { ?>
+							<?php if($user->language_id == $language->id) { ?>
+							<option selected="selected" value="<?php echo $language->id;?>"><?php echo $language->name;?></option>
+							<?php } else { ?>
+							<option value="<?php echo $language->id;?>"><?php echo $language->name;?></option>
+							<?php } ?>
+							<?php } ?>
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-5" class="caption"><?php echo $this->_('Country');?></label>
+					</div>
+					<div class="cell">
+						<select class="large" id="f-5" name="country_iso_code_3">
+							<option value="null"><?php echo $this->_('Select');?></option>
+							<?php foreach($countries AS $country) { ?>
+							<?php if($user->country_iso_code_3 == $country->iso_code_3) { ?>
+							<option selected="selected" value="<?php echo $country->iso_code_3;?>"><?php echo $country->name;?></option>
+							<?php } else { ?>
+							<option value="<?php echo $country->iso_code_3;?>"><?php echo $country->name;?></option>
+							<?php } ?>
+							<?php } ?>
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-3city" class="caption"><?php echo $this->_('City');?></label>
+					</div>
+					<div class="cell">
+						<input type="text" id="f-3city" class="large" name="city" value="<?php echo $user->city;?>" maxlength="35" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label class="caption"><?php echo $this->_('Gender');?></label>
+					</div>
+					<div class="cell">
+						<p class="checkgroup">
+							<label for="f-6" class="radio"><input type="radio" name="gender" id="f-6" value="male" <?php if($user->gender == 'male') { ?>checked="checked"<?php } ?> /><span class="icon"></span> <span class="rtext"><?php echo $this->_('Male');?></span></label>
+							<label for="f-6b" class="radio"><input type="radio" name="gender" id="f-6b" value="female" <?php if($user->gender == 'female') { ?>checked="checked"<?php } ?> /><span class="icon"></span> <span class="rtext"><?php echo $this->_('Female');?></span></label>
+							<label for="f-6c" class="radio"><input type="radio" name="gender" id="f-6c" value="unsigned" <?php if($user->gender == 'unsigned') { ?>checked="checked"<?php } ?> /><span class="icon"></span> <span class="rtext"><?php echo $this->_('Unspecified');?></span></label>
+						</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-7" class="caption"><?php echo $this->_('About You');?></label>
+					</div>
+					<div class="cell">
+						<textarea id="f-7" class="large event-elastic" name="about"><?php echo $user->about;?></textarea>
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-8" class="caption"><?php echo $this->_('Website');;?></label>
+					</div>
+					<div class="cell">
+						<input type="text" id="f-8" class="large<?php if(isset($this->errors['website'])) { echo ' error-field'; }?>" value="<?php echo $user->website;?>" name="website" placeholder="http://" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-9" class="caption"><?php echo $this->_('Search Privacy');?></label>
+					</div>
+					<div class="cell">
+						<span class="checkbox-slider"><input id="f-9" type="checkbox" name="search_engines" value="1" <?php if($user->search_engines) { ?>checked="checked"<?php } ?> /><label for="f-9"><span>&nbsp;</span></label></span>
+						<span class="helptext"><?php echo $this->_('Prevent search engines (ex: Google, Bing, Yandex) from displaying your Pintastic profile in search results');?></span>
+					</div>
+				</div>
+			</div>
+			<div class="titlebar">
+				<h2 class="title-2"><?php echo $this->_('Email Notifications Settings');?></h2>
+			</div>
+			<div class="mainform">
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-10" class="caption"><?php echo $this->_('Group Pins');?></label>
+					</div>
+					<div class="cell">
+						<span class="checkbox-slider"><input id="f-10" type="checkbox" name="notification_group_board" value="1" <?php if($user->notification_group_board) { ?>checked="checked"<?php } ?> /><label for="f-10"><span>&nbsp;</span></label></span>
+						<span class="helptext"><?php echo $this->_('When a new pin is added to a group board');?></span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-11" class="caption"><?php echo $this->_('Comments');?></label>
+					</div>
+					<div class="cell">
+						<span class="checkbox-slider"><input id="f-11" type="checkbox" name="notification_comment_pin" value="1" <?php if($user->notification_comment_pin) { ?>checked="checked"<?php } ?> /><label for="f-11"><span>&nbsp;</span></label></span>
+						<span class="helptext"><?php echo $this->_('When someone comments on your pin');?></span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-112" class="caption">&nbsp;</label>
+					</div>
+					<div class="cell">
+						<span class="checkbox-slider"><input id="f-112" type="checkbox" name="notification_mentioned" value="1" <?php if($user->notification_comment_pin) { ?>checked="checked"<?php } ?> /><label for="f-112"><span>&nbsp;</span></label></span>
+						<span class="helptext"><?php echo $this->_('When someone mentions you in a comment');?></span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-12" class="caption"><?php echo $this->_('Likes');?></label>
+					</div>
+					<div class="cell">
+						<span class="checkbox-slider"><input id="f-12" type="checkbox" name="notification_like_pin" value="1" <?php if($user->notification_like_pin) { ?>checked="checked"<?php } ?> /><label for="f-12"><span>&nbsp;</span></label></span>
+						<span class="helptext"><?php echo $this->_('When someone likes your pin');?></span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-13" class="caption"><?php echo $this->_('Repins');?></label>
+					</div>
+					<div class="cell">
+						<span class="checkbox-slider"><input id="f-13" type="checkbox" name="notification_repin_pin" value="1" <?php if($user->notification_repin_pin) { ?>checked="checked"<?php } ?> /><label for="f-13"><span>&nbsp;</span></label></span>
+						<span class="helptext"><?php echo $this->_('When your pin is repinned');?></span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-14" class="caption"><?php echo $this->_('Follows');?></label>
+					</div>
+					<div class="cell">
+						<span class="checkbox-slider"><input id="f-14" type="checkbox" name="notification_follow_user" value="1" <?php if($user->notification_follow_user) { ?>checked="checked"<?php } ?> /><label for="f-14"><span>&nbsp;</span></label></span>
+						<span class="helptext"><?php echo $this->_('When a new person follows you');?></span>
+					</div>
+				</div>
+				<?php /* ?>
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-17" class="caption"><?php echo $this->_('News');?></label>
+					</div>
+					<div class="cell">
+						<span class="checkbox-slider"><input id="f-17" type="checkbox" name="notification_news" value="1" <?php if($user->notification_news) { ?>checked="checked"<?php } ?> /><label for="f-17"><span>&nbsp;</span></label></span>
+					</div>
+				</div>
+				<?php */ ?>
+			</div>
+			
+			<?php
+				$menu = \Base\Menu::getMenu('oAuth');	
+				if($self_edit && $menu) {
+			?>
+			<div class="titlebar">
+				<h2 class="title-2"><?php echo $this->_('Social Networks');?></h2>
+			</div>
+			<?php } ?>
+			<div class="mainform">
+				<?php if($self_edit && $menu) { ?>
+				<?php foreach($menu AS $widget) { ?>
+				<?php echo $this->widget($widget->widget, array('method' => 'connect', 'redirect' => $this->url(array(),'settings'))); ?>
+				<?php } ?>
+				<?php } ?>
+				<div class="submit clearfix">
+					<a href="<?php echo $this->url(array('controller' => 'delete', 'user_id' => $user->id,'query' => $user->username),'user_c');?>" class="event-fancybox-ajax fright disabled-text"><strong><?php echo $this->_('Deactivate Account');?></strong></a>
+					<button type="submit" class="button button-color-1 button-size-small"><?php echo $this->_('Save Settings');?></button>
+				</div>
+			</div>
+			
+		</div>
+	</section>
+</form>
+
+<script type="text/javascript" src="assets/js/jquery-mentions/lib/jquery.elastic.js"></script>
+<script type="text/javascript">
+$('.event-elastic').elastic();
+</script>
+<?php } ?>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

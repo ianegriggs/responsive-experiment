@@ -1,0 +1,18 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<?php echo $this->widget('pin.widget.SearchHeader'); ?>
+
+<?php 
+$pinsTable = new \Pin\Pin();
+$query = $this->getRequest()->getRequest('query');
+echo $this->widget('pin.widget.grid', array(
+	'filter' => array(
+		//'where' => 'LENGTH(`description`) >= ' . mb_strlen($query,'utf-8') . ' AND `description` REGEXP ' . $pinsTable->getAdapter()->quote('#?'.$query)
+		'description' => $query	
+	),
+	'useIndex' => array('PRIMARY'),
+	'module' => 'search_pin'
+));
+?>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

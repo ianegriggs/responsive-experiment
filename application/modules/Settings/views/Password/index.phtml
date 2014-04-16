@@ -1,0 +1,79 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<section class="bgcolor-1" id="headbar">
+	<div class="container">
+		<h1 class="title-9"><?php echo $this->_('Account Settings');?><?php if(!$self_edit) { ?> / <?php echo $user->getUserFullname();?><?php } ?></h1>
+	</div>
+</section>
+
+<?php 
+$demo_user_id = \Base\Config::get('demo_user_id');
+if($demo_user_id && $demo_user_id == \User\User::getUserData()->id) {
+?>
+<div class="notification error">
+	<?php echo $this->_('You don\'t have permissions for this action!');?>
+</div>
+<?php } else { ?>
+<form action="<?php echo $this->url(array('controller' => 'password', 'user_id' => $user->id),'settings_c');?>" method="post">
+	<section id="content">
+		<div class="container table bgcolor-1 padding-3 radius">
+			<div class="titlebar">
+				<h2 class="title-2"><?php echo $this->_('Change your password');?></h2>
+			</div>
+			<div class="mainform">
+				<p class="hide">
+					<input type="hidden" name="X-form-cmd" value="<?php echo $this->x_form_cmd;?>" />
+				</p>
+				<?php if($this->errors) { ?>
+				<div class="notification error">
+					<?php echo implode('<br />', $this->errors);?>
+					<a class="button-close" href="javascript:;"><?php echo $this->_('Close')?></a>
+				</div>
+				<?php } else if($this->success) { ?>
+				<div class="notification success color-7">
+					<?php echo $this->success;?>
+					<a class="button-close" href="javascript:;"><?php echo $this->_('Close')?></a>
+				</div>
+				<?php } ?>
+
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-3" class="caption"><?php echo $this->_('Old password');?></label>
+					</div>
+					<div class="cell">
+						<input type="password" autocomplete="off" id="f-3" class="large<?php if(isset($this->errors['old_password'])) { echo ' error-field'; }?>" name="old_password" value="<?php echo $this->getRequest()->getPost('old_password');?>" />
+					</div>
+				</div>
+				
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-31" class="caption"><?php echo $this->_('New password');?></label>
+					</div>
+					<div class="cell">
+						<input type="password" autocomplete="off" id="f-31" class="large<?php if(isset($this->errors['new_password'])) { echo ' error-field'; }?>" name="new_password" value="<?php echo $this->getRequest()->getPost('new_password');?>" />
+					</div>
+				</div>
+				
+				<div class="row">
+					<div class="cell cell-first">
+						<label for="f-32" class="caption"><?php echo $this->_('Confirm password');?></label>
+					</div>
+					<div class="cell">
+						<input type="password" autocomplete="off" id="f-32" class="large<?php if(isset($this->errors['confirm_password'])) { echo ' error-field'; }?>" name="confirm_password" value="<?php echo $this->getRequest()->getPost('confirm_password');?>" />
+					</div>
+				</div>
+			</div>
+			
+			<div class="mainform">
+
+				<div class="submit clearfix">
+					<button type="submit" class="button button-color-1 button-size-small"><?php echo $this->_('Save Settings');?></button><button onclick="window.location='<?php echo $this->url(array('user_id' => $user->id),'settings');?>'" type="button" class="button button-color-2 button-size-small"><?php echo $this->_('Cancel');?></button>
+				</div>
+			</div>
+			
+		</div>
+	</section>
+</form>
+<?php } ?>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

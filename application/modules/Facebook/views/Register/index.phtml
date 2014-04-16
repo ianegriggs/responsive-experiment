@@ -1,0 +1,72 @@
+<?php echo $this->getController('home/layout/header_part_short'); ?>
+
+<section id="content">
+	
+	<?php echo $this->widget('user.widget.social', array('method' => 'register', 'redirect' => $this->redirect));?>
+		
+	<div class="container mobile bgcolor-1 padding-4 radius arrow-left">
+		<span class="sticky-icon-logreg"></span>
+		<div class="registerform">
+			<?php if($this->errors) { ?>
+			<div class="notification error no-mtop">
+				<?php echo implode('<br />', $this->errors);?>
+				<a class="button-close" href="javascript:;"><?php echo $this->_('Close')?></a>
+			</div>
+			<?php } ?>
+			
+			<form action="<?php echo $this->url(array('controller' => 'register'),'facebook');?>" method="post">
+				<p class="hide">
+					<input type="hidden" name="X-form-cmd" value="<?php echo $this->x_form_cmd;?>" />
+					<?php if($this->redirect) { ?>
+					<input type="hidden" name="redirect" value="<?php echo $this->redirect;?>" />
+					<?php } ?>
+					<?php if($this->invited_code) { ?>
+					<input type="hidden" name="invited_code" value="<?php echo $this->invited_code;?>" />
+					<?php } ?>
+				</p>
+				
+				<div class="row">
+					<input type="text" autocomplete="off" name="username" value="<?php echo $this->getRequest()->getPost('username')?>" placeholder="<?php echo $this->escape($this->_('Username'));?>" class="icon-input-user<?php if(isset($this->errors['username'])) { echo ' error-field'; }?>">
+				</div>
+				<div class="row">
+					<input type="text" autocomplete="off" name="email" value="<?php echo $this->getRequest()->getPost('email')?>" placeholder="<?php echo $this->escape($this->_('E-mail'));?>" class="icon-input-email<?php if(isset($this->errors['email'])) { echo ' error-field'; }?>" />
+				</div>
+				<div class="row">
+					<input type="password" autocomplete="off" name="password" placeholder="<?php echo $this->escape($this->_('Password'));?>" class="icon-input-password<?php if(isset($this->errors['password'])) { echo ' error-field'; }?>" />
+				</div>
+				
+				
+				<div class="row clearfix">
+					<div class="changeavatar">
+						<div class="avatar" style="background-image: url(https://graph.facebook.com/me/picture?access_token=<?php echo $this->access_token;?>&type=large);"></div>
+						<input type="hidden" name="avatar" value="https://graph.facebook.com/me/picture?access_token=<?php echo $this->access_token;?>&type=large" />
+					</div>
+				</div>
+				<div class="row group">
+					<input type="text" name="first_name" value="<?php echo $this->getRequest()->getPost('first_name')?>" placeholder="<?php echo $this->escape($this->_('First Name'));?>" class="<?php if(isset($this->errors['first_name'])) { echo ' error-field'; }?>">
+				</div>
+				<div class="row">
+					<input type="text" name="last_name" value="<?php echo $this->getRequest()->getPost('last_name')?>" placeholder="<?php echo $this->escape($this->_('Last Name'));?>" class="<?php if(isset($this->errors['last_name'])) { echo ' error-field'; }?>">
+				</div>
+				<div class="row">
+					<select name="gender">
+						<option <?php if($this->getRequest()->getPost('gender')=='unsigned') { echo 'selected="selected"'; }?> value="unsigned"><?php echo $this->_('Select your gender');?></option>
+						<option <?php if($this->getRequest()->getPost('gender')=='male') { echo 'selected="selected"'; }?> value="male"><?php echo $this->_('Male');?></option>
+						<option <?php if($this->getRequest()->getPost('gender')=='female') { echo 'selected="selected"'; }?> value="female"><?php echo $this->_('Female');?></option>
+					</select>
+				</div>
+				<div class="row">
+					<?php echo $this->widget('user.widget.terms');?>
+				</div>
+				
+				<div class="row">
+					<button class="button button-color-1 button-size-large"><?php echo $this->_('Register');?></button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	
+</section>
+
+<?php echo $this->getController('home/layout/footer_part'); ?>

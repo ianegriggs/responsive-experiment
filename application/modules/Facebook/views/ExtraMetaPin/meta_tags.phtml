@@ -1,0 +1,17 @@
+<?php if(\Base\Config::get('facebook_key')) { ?>
+<meta property="fb:app_id" content="<?php echo \Base\Config::get('facebook_key');?>"/>
+<meta property="og:site_name" content="<?php echo \Meta\Meta::getGlobal('title');?>"/>
+<meta property="og:url" content="<?php echo $this->url(array('pin_id' => $pin->id),'pin');?>"/>
+<meta property="og:title" content="<?php echo $pin->title;?>"/>
+<meta property="og:description" content="<?php echo $pin->description;?>"/>
+<?php $image = \Pin\Helper\Image::getImage('medium', $pin);?>
+<meta property="og:image" content="<?php echo $image->image;?>"/>
+<?php if($pin->video) { ?>
+<meta property="og:video" content="<?php echo $pin->from;?>"/>
+<?php } ?>
+<?php if(\Base\Config::get('facebook_og_namespace') && \Base\Config::get('facebook_og_action')) { ?>
+<meta property="og:type" content="<?php echo \Base\Config::get('facebook_og_namespace');?>:<?php echo \Base\Config::get('facebook_og_action');?>"/>
+<?php } else { ?>
+<meta property="og:type" content="website"/>
+<?php } ?>
+<?php } ?>

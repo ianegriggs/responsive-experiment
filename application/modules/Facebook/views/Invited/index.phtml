@@ -1,0 +1,16 @@
+<?php echo $this->getController('home/layout/header_part'); ?>
+
+<section id="content">
+	<div class="container bgcolor-1 radius">
+		<div class="padding-3">
+			<div class="textbox">
+				<h1><?php echo $this->_('Congratulations!');?></h1>
+				<h2><?php echo sprintf($this->_('You\'ve been invited to join %s.'), \Meta\Meta::getGlobal('title'));?></h2>
+				
+				<p class="socrow clearfix center">
+					<?php echo $this->widget('facebook.widget.oauth', array('method' => 'register','redirect' => '&invited_code=' . $this->getRequest()->getRequest('invited_code')));?>
+				</p>
+			</div>
+		</div>	
+	</div>
+</section>

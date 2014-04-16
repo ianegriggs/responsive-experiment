@@ -1,0 +1,49 @@
+<?php if($users && $users->count()) { ?>
+<div class="whitebox">
+	<h3 class="title-5"><?php echo $this->_('Users who repin this pin');?></h3>
+	<div class="gallery">
+		<a href="javascript:;" class="button button-gallery button-gallery-prev event-gallery-prev-from-userrepin<?php echo $this->pin->id;?>">&nbsp;</a>
+		<ul class="clearfix event-userrepin<?php echo $this->pin->id;?>-pins">
+			<?php foreach($users AS $user) { ?>
+			<li><a class="event-turbo-click event-history event-width-100 event-no-loader" href="<?php echo $this->url(array('user_id'=>$user->id,'query'=>$user->username),'user');?>"<?php if($popup) { ?> data-popup="true"<?php } ?>><img class="event-load-lazy-load" width="78" height="78" alt="Thumb" src="assets/images/grey.gif" data-original="<?php echo \User\Helper\Avatar::getImage('small', $user)->image;?>" onload="$(this).LazyLoad();" /></a></li>
+			<?php } ?>
+		</ul>
+		<a href="javascript:;" class="button button-gallery button-gallery-next event-gallery-next-from-userrepin<?php echo $this->pin->id;?>">&nbsp;</a>
+	</div>
+</div>
+<script type="text/javascript">
+var cachedDatauserrepin<?php echo $this->pin->id;?> = {'1' : $('.event-userrepin<?php echo $this->pin->id;?>-pins').get(0).outerHtml}, page=1;
+$('.event-gallery-prev-from-userrepin<?php echo $this->pin->id;?>').click(function() {
+	var self = this;
+	App.addLoaderFull(self);
+	page--;
+	if(page < 1) {
+		page = 1;
+	}
+	if(cachedDatauserrepin<?php echo $this->pin->id;?>[page]) {
+		$('.event-userrepin<?php echo $this->pin->id;?>-pins').replaceWith(cachedDatauserrepin<?php echo $this->pin->id;?>[page]);
+	}
+	App.removeLoader(self);
+});
+$('.event-gallery-next-from-userrepin<?php echo $this->pin->id;?>').click(function() {
+	var self = this;
+	App.addLoaderFull(self);
+	page++;
+	if(cachedDatauserrepin<?php echo $this->pin->id;?>[page]) {
+		App.removeLoader(self);
+		$('.event-userrepin<?php echo $this->pin->id;?>-pins').replaceWith(cachedDatauserrepin<?php echo $this->pin->id;?>[page]);
+	} else {
+		App._ajax({
+			'url' : '?widget=user.widget.pinprofilerepin&pin_id=<?php echo $this->pin->id;?>&page='+ page + '&limit=<?php echo $limit;?><?php if($popup) { ?>&popup=true<?php } ?>',
+			'onSuccess': function(data) {
+				if(data) {
+					cachedDatauserrepin<?php echo $this->pin->id;?>[page] = data;
+					$('.event-userrepin<?php echo $this->pin->id;?>-pins').replaceWith(data);
+				}
+				App.removeLoader(self);
+			}
+		});
+	}
+});
+</script>
+<?php } ?>

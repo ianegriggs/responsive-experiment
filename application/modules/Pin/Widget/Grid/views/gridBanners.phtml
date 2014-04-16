@@ -1,0 +1,19 @@
+<?php if($banners) { ?>
+<?php foreach($banners AS $banner) { ?>
+<article class="box box-banner-<?php echo $banner->id;?>" style="width:<?php echo $banner->width;?>px;height:<?php echo $banner->height;?>px;">
+	<div class="banner radius" style="width:<?php echo $banner->width;?>px;height:<?php echo $banner->height;?>px;overflow:hidden;">
+		<?php if($banner->type == 'img') { ?>
+		<?php if($banner->url) { ?>
+		<a href="<?php echo $banner->url;?>" onclick="target='_blank'">
+			<img alt="Banner" class="event-load-lazy-load" width="<?php echo $banner->width;?>" height="<?php echo $banner->height;?>" src="assets/images/grey.gif" data-original="uploads/data/<?php echo $banner->photo;?>">
+		</a>
+		<?php } else { ?>
+		<img alt="Banner" class="event-load-lazy-load" width="<?php echo $banner->width;?>" height="<?php echo $banner->height;?>" src="assets/images/grey.gif" data-original="uploads/data/<?php echo $banner->photo;?>">
+		<?php } ?>
+		<?php } else if($banner->type == 'html') { ?>
+			<?php echo $banner->html;?>
+		<?php } ?>
+	</div>
+</article>
+<?php } ?>
+<?php } ?>
